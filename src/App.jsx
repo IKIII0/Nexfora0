@@ -21,37 +21,38 @@ function App() {
   if (showLogin) {
     return <Login onBack={() => setShowLogin(false)} />;
   }
-  // Data dummy untuk produk/jasa
+  // Daftar produk/jasa
   const services = [
     {
       title: "Kelas Python Lengkap",
       description:
-        "Belajar Python dari dasar hingga mahir. Cocok untuk data science dan backend.",
-      price: "Rp 750.000",
+        "Belajar Python dari dasar hingga mahir. Cocok untuk data science dan machine learning.",
+      price: "Rp 100.000",
       icon: <FaPython className="text-blue-400" size={32} />,
     },
     {
       title: "Kelas Dasar Pemrograman Pascal",
       description:
         "Pelajari dasar-dasar pemrograman dengan Pascal. Sempurna untuk pemula yang ingin memahami logika pemrograman.",
-      price: "Rp 500.000",
+      price: "Rp 5.000 - Rp 10.000",
       icon: <FaBook className="text-purple-400" size={32} />,
     },
     {
       title: "Jasa Pembuatan Website",
       description:
         "Bangun website profesional untuk bisnis atau portofolio Anda dengan teknologi terbaru.",
-      price: "Mulai dari Rp 2.000.000",
+      price: "Mulai dari Rp 500.000",
       icon: <FaCode className="text-green-400" size={32} />,
     },
     {
       title: "Jasa Design Grafis",
       description:
         "Desain logo, banner, poster, dan materi promosi profesional untuk meningkatkan brand Anda.",
-      price: "Mulai dari Rp 500.000",
+      price: "Rp 5.000 - Rp 450.000",
       icon: <FaPaintBrush className="text-pink-400" size={32} />,
     },
   ];
+  // Akhir daftar produk/jasa
 
   return (
     // Wrapper utama dengan gradasi warna yang diminta
@@ -90,7 +91,7 @@ function App() {
             </a>
             <button
               onClick={() => setShowLogin(true)}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 px-6 py-2 rounded-full transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-blue-500/50 font-semibold"
+              className="bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 px-6 py-2 rounded-full transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-blue-500/50 font-semibold"
             >
               Login
             </button>
@@ -137,7 +138,7 @@ function App() {
                 setShowLogin(true);
                 setMobileMenuOpen(false);
               }}
-              className="block w-full text-left bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 px-4 py-3 rounded-lg transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-blue-500/50 font-semibold mt-4"
+              className="block w-full text-left bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 px-4 py-3 rounded-lg transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-blue-500/50 font-semibold mt-4"
             >
               Login
             </button>
@@ -156,7 +157,7 @@ function App() {
         </p>
         <a
           href="#services"
-          className="inline-block bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-400 hover:to-purple-500 text-white font-bold py-3 px-8 rounded-full text-lg transition-all duration-300 hover:scale-110 hover:shadow-2xl hover:shadow-purple-500/50 animate-on-load animate-scale-in delay-600 glow-on-hover"
+          className="inline-block bg-linear-to-r from-blue-500 to-purple-600 hover:from-blue-400 hover:to-purple-500 text-white font-bold py-3 px-8 rounded-full text-lg transition-all duration-300 hover:scale-110 hover:shadow-2xl hover:shadow-purple-500/50 animate-on-load animate-scale-in delay-600 glow-on-hover"
         >
           Mulai Jelajahi
         </a>

@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { FaEnvelope, FaLock, FaEye, FaEyeSlash, FaGoogle, FaGithub } from "react-icons/fa";
+import {
+  FaEnvelope,
+  FaLock,
+  FaEye,
+  FaEyeSlash,
+  FaGoogle,
+  FaGithub,
+} from "react-icons/fa";
 
 function Login({ onBack }) {
   const [showPassword, setShowPassword] = useState(false);
@@ -14,13 +21,13 @@ function Login({ onBack }) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-blue-950 text-white flex items-center justify-center p-6">
+    <div className="min-h-screen bg-linear-to-br from-gray-900 via-black to-blue-950 text-white flex items-center justify-center p-6">
       <div className="w-full max-w-md">
         {/* Logo/Brand */}
         <div className="text-center mb-8 animate-on-load animate-fade-in-down">
-          <button 
+          <button
             onClick={onBack}
-            className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 mb-2 hover:opacity-80 transition-opacity cursor-pointer"
+            className="text-4xl font-bold text-transparent bg-clip-text bg-linear-to-r from-blue-400 to-purple-500 mb-2 hover:opacity-80 transition-opacity cursor-pointer"
           >
             Nexfora
           </button>
@@ -32,7 +39,10 @@ function Login({ onBack }) {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email Input */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-300 mb-2"
+              >
                 Email
               </label>
               <div className="relative">
@@ -53,7 +63,10 @@ function Login({ onBack }) {
 
             {/* Password Input */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-300 mb-2"
+              >
                 Password
               </label>
               <div className="relative">
@@ -88,7 +101,10 @@ function Login({ onBack }) {
                 />
                 <span className="ml-2 text-gray-300">Ingat saya</span>
               </label>
-              <a href="#" className="text-blue-400 hover:text-blue-300 transition-colors">
+              <a
+                href="#"
+                className="text-blue-400 hover:text-blue-300 transition-colors"
+              >
                 Lupa password?
               </a>
             </div>
@@ -96,7 +112,7 @@ function Login({ onBack }) {
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-3 rounded-lg transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
+              className="w-full bg-linear-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-3 rounded-lg transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
             >
               Masuk
             </button>
@@ -108,7 +124,9 @@ function Login({ onBack }) {
               <div className="w-full border-t border-gray-700"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-gray-800/50 text-gray-400">Atau masuk dengan</span>
+              <span className="px-4 bg-gray-800/50 text-gray-400">
+                Atau masuk dengan
+              </span>
             </div>
           </div>
 
@@ -127,8 +145,8 @@ function Login({ onBack }) {
           {/* Sign Up Link */}
           <p className="text-center text-sm text-gray-400 mt-6">
             Belum punya akun?{" "}
-            <button 
-              onClick={() => alert('Fitur registrasi akan segera hadir!')} 
+            <button
+              onClick={() => alert("Fitur registrasi akan segera hadir!")}
               className="text-blue-400 hover:text-blue-300 font-medium transition-colors"
             >
               Daftar sekarang

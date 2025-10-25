@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import ProductCard from "./components/ProductCard";
+import TeamCard from "./components/TeamCard";
 import Login from "./components/Login";
 
 // Import ikon (opsional, tapi bagus untuk UI)
@@ -21,8 +22,8 @@ function App() {
   if (showLogin) {
     return <Login onBack={() => setShowLogin(false)} />;
   }
-  // Daftar produk/jasa
-  const services = [
+  // Daftar Kelas
+  const kelas = [
     {
       title: "Kelas Python Lengkap",
       description:
@@ -37,6 +38,10 @@ function App() {
       price: "Rp 5.000 - Rp 10.000",
       icon: <FaBook className="text-purple-400" size={32} />,
     },
+  ];
+
+  // Daftar Jasa
+  const jasa = [
     {
       title: "Jasa Pembuatan Website",
       description:
@@ -52,7 +57,40 @@ function App() {
       icon: <FaPaintBrush className="text-pink-400" size={32} />,
     },
   ];
-  // Akhir daftar produk/jasa
+
+  // Daftar Team Nexfora
+  const teamMembers = [
+    {
+      name: "Rifki Al Sauqy",
+      role: "CEO & Founder",
+      photo:
+        "https://ui-avatars.com/api/?name=Rifki+Al+Sauqy&background=3b82f6&color=fff&size=200",
+      description: "Seorang Pengajar dari Nexfora",
+    },
+    {
+      name: "Yehezkiel Gustav Setiawan S",
+      role: "CEO & Founder",
+      photo:
+        "https://ui-avatars.com/api/?name=Yehezkiel+Gustav+Setiawan+S&background=8b5cf6&color=fff&size=200",
+      description: "Seorang UI/UX Designer dari Nexfora",
+    },
+    {
+      name: "M. Diaz William Bevan",
+      role: "CEO & Founder",
+      photo:
+        "https://ui-avatars.com/api/?name=M.Diaz+William+Bevan&background=ec4899&color=fff&size=200",
+      description:
+        "Seorang jasa pembuatan website dari Nexfora berbasis wordpress",
+    },
+    {
+      name: "M. Farhan Prasetyo",
+      role: "CEO & Founder",
+      photo:
+        "https://ui-avatars.com/api/?name=M.Farhan+Prasetyo&background=10b981&color=fff&size=200",
+      description:
+        "Seorang jasa pembuatan website dari Nexfora berbasis wordpress",
+    },
+  ];
 
   return (
     // Wrapper utama dengan gradasi warna yang diminta
@@ -78,13 +116,19 @@ function App() {
               Home
             </button>
             <a
-              href="#services"
+              href="#team"
+              className="nav-link hover:text-blue-400 transition-all duration-300 hover:scale-110 font-medium"
+            >
+              Team
+            </a>
+            <a
+              href="#kelas"
               className="nav-link hover:text-blue-400 transition-all duration-300 hover:scale-110 font-medium"
             >
               Kelas
             </a>
             <a
-              href="#services"
+              href="#jasa"
               className="nav-link hover:text-blue-400 transition-all duration-300 hover:scale-110 font-medium"
             >
               Jasa
@@ -120,14 +164,21 @@ function App() {
               Home
             </button>
             <a
-              href="#services"
+              href="#team"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block w-full text-left py-3 px-4 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-all duration-300 hover:translate-x-2 font-medium"
+            >
+              Team
+            </a>
+            <a
+              href="#kelas"
               onClick={() => setMobileMenuOpen(false)}
               className="block w-full text-left py-3 px-4 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-all duration-300 hover:translate-x-2 font-medium"
             >
               Kelas
             </a>
             <a
-              href="#services"
+              href="#jasa"
               onClick={() => setMobileMenuOpen(false)}
               className="block w-full text-left py-3 px-4 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-all duration-300 hover:translate-x-2 font-medium"
             >
@@ -156,23 +207,52 @@ function App() {
           dan jasa pembuatan website profesional.
         </p>
         <a
-          href="#services"
+          href="#team"
           className="inline-block bg-linear-to-r from-blue-500 to-purple-600 hover:from-blue-400 hover:to-purple-500 text-white font-bold py-3 px-8 rounded-full text-lg transition-all duration-300 hover:scale-110 hover:shadow-2xl hover:shadow-purple-500/50 animate-on-load animate-scale-in delay-600 glow-on-hover"
         >
           Mulai Jelajahi
         </a>
       </header>
 
-      {/* --- Daftar Produk/Jasa --- */}
-      <main id="services" className="container mx-auto p-6 pb-20">
+      {/* --- Section Team --- */}
+      <section id="team" className="container mx-auto p-6 pb-20">
+        <h3 className="text-3xl font-bold text-center mb-4 animate-on-load animate-fade-in-up delay-200">
+          Core Team of Nexfora
+        </h3>
+        <p className="text-center text-gray-300 mb-12 max-w-2xl mx-auto animate-on-load animate-fade-in-up delay-300">
+          Kenalan dengan orang-orang hebat di balik kesuksesan Nexfora
+        </p>
+
+        {/* Grid responsif - 4 kolom di desktop, 2 di tablet, 1 di mobile */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
+          {teamMembers.map((member, index) => (
+            <div
+              key={index}
+              className={`animate-on-load animate-fade-in delay-${
+                (index + 4) * 100
+              }`}
+            >
+              <TeamCard
+                name={member.name}
+                role={member.role}
+                photo={member.photo}
+                description={member.description}
+              />
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* --- Section Kelas --- */}
+      <section id="kelas" className="container mx-auto p-6 pb-12">
         <h3 className="text-3xl font-bold text-center mb-12 animate-on-load animate-fade-in-up delay-300">
-          Layanan Kami
+          Kelas Kami
         </h3>
 
         {/* Grid responsif */}
         {/* 1 kolom di mobile, 2 kolom di tablet (md) & desktop (lg) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-          {services.map((service, index) => (
+          {kelas.map((item, index) => (
             <div
               key={index}
               className={`animate-on-load animate-fade-in delay-${
@@ -180,15 +260,42 @@ function App() {
               }`}
             >
               <ProductCard
-                title={service.title}
-                description={service.description}
-                price={service.price}
-                icon={service.icon}
+                title={item.title}
+                description={item.description}
+                price={item.price}
+                icon={item.icon}
               />
             </div>
           ))}
         </div>
-      </main>
+      </section>
+
+      {/* --- Section Jasa --- */}
+      <section id="jasa" className="container mx-auto p-6 pb-20">
+        <h3 className="text-3xl font-bold text-center mb-12 animate-on-load animate-fade-in-up delay-300">
+          Jasa Kami
+        </h3>
+
+        {/* Grid responsif */}
+        {/* 1 kolom di mobile, 2 kolom di tablet (md) & desktop (lg) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+          {jasa.map((item, index) => (
+            <div
+              key={index}
+              className={`animate-on-load animate-fade-in delay-${
+                (index + 6) * 100
+              }`}
+            >
+              <ProductCard
+                title={item.title}
+                description={item.description}
+                price={item.price}
+                icon={item.icon}
+              />
+            </div>
+          ))}
+        </div>
+      </section>
 
       {/* --- Footer --- */}
       <footer className="border-t border-gray-800 text-center p-8 animate-on-load animate-fade-in delay-800">

@@ -63,32 +63,27 @@ function App() {
     {
       name: "Rifki Al Sauqy",
       role: "CEO & Founder",
-      photo:
-        "https://ui-avatars.com/api/?name=Rifki+Al+Sauqy&background=3b82f6&color=fff&size=200",
+      photo: "/img/Rifki.jpg",
       description: "Seorang Pengajar dari Nexfora",
     },
     {
       name: "Yehezkiel Gustav Setiawan S",
       role: "CEO & Founder",
-      photo:
-        "https://ui-avatars.com/api/?name=Yehezkiel+Gustav+Setiawan+S&background=8b5cf6&color=fff&size=200",
+      photo: "/img/Kiel.jpg",
       description: "Seorang UI/UX Designer dari Nexfora",
     },
     {
       name: "M. Diaz William Bevan",
       role: "CEO & Founder",
-      photo:
-        "https://ui-avatars.com/api/?name=M.Diaz+William+Bevan&background=ec4899&color=fff&size=200",
+      photo: "/img/Willy.jpg",
       description:
         "Seorang jasa pembuatan website dari Nexfora berbasis wordpress",
     },
     {
       name: "M. Farhan Prasetyo",
       role: "CEO & Founder",
-      photo:
-        "https://ui-avatars.com/api/?name=M.Farhan+Prasetyo&background=10b981&color=fff&size=200",
-      description:
-        "Seorang jasa pembuatan website dari Nexfora berbasis wordpress",
+      photo: "/img/Farhan.jpg",
+      description: "Seorang UI/UX Designer dari Nexfora",
     },
   ];
 
@@ -264,6 +259,7 @@ function App() {
                 description={item.description}
                 price={item.price}
                 icon={item.icon}
+                whatsappNumber="6282273875270"
               />
             </div>
           ))}
@@ -291,6 +287,7 @@ function App() {
                 description={item.description}
                 price={item.price}
                 icon={item.icon}
+                whatsappNumber="6285831163191"
               />
             </div>
           ))}

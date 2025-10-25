@@ -83,7 +83,8 @@ function App() {
       name: "M. Farhan Prasetyo",
       role: "CEO & Founder",
       photo: "/img/Farhan.jpg",
-      description: "Seorang UI/UX Designer dari Nexfora",
+      description:
+        "Seorang jasa pembuatan website dari Nexfora berbasis wordpress",
     },
   ];
 

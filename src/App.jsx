@@ -3,8 +3,6 @@ import ProductCard from "./components/ProductCard";
 import TeamCard from "./components/TeamCard";
 import Login from "./components/Login";
 
-// Import ikon (opsional, tapi bagus untuk UI)
-// Anda bisa install react-icons: npm install react-icons
 import {
   FaPython,
   FaCode,
@@ -89,10 +87,6 @@ function App() {
   ];
 
   return (
-    // Wrapper utama dengan gradasi warna yang diminta
-    // min-h-screen: memastikan background menutupi seluruh layar
-    // bg-gradient-to-br: gradasi dari (t)op-(l)eft ke (b)ottom-(r)ight
-    // from-gray-900 via-black to-blue-950: gradasi dari abu-abu sangat gelap, ke hitam, ke biru sangat gelap
     <div className="min-h-screen bg-linear-to-br from-gray-900 via-black to-blue-950 text-white font-sans">
       {/* --- Navbar --- */}
       <nav className="sticky top-0 z-50 bg-gray-900/80 backdrop-blur-lg border-b border-gray-800/50 animate-on-load animate-fade-in-down">

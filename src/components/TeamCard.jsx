@@ -1,5 +1,3 @@
-// src/components/TeamCard.jsx
-
 import React from "react";
 
 const TeamCard = ({ name, role, photo, description }) => {

@@ -133,7 +133,7 @@ function Login({ onBack }) {
           {/* Social Login Buttons */}
           <div className="grid grid-cols-2 gap-4">
             <button className="flex items-center justify-center gap-2 py-3 px-4 bg-gray-900/50 border border-gray-600 rounded-lg hover:bg-gray-700/50 transition-colors">
-              <FaGoogle className="text-red-400" />
+              <img src="../public/google.svg" alt="" className="text-sm w-5" />
               <span className="text-sm">Google</span>
             </button>
             <button className="flex items-center justify-center gap-2 py-3 px-4 bg-gray-900/50 border border-gray-600 rounded-lg hover:bg-gray-700/50 transition-colors">

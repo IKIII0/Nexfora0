@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import ProductCard from "./components/ProductCard";
 import TeamCard from "./components/TeamCard";
 import Login from "./components/Login";
+import Typewriter from "typewriter-effect";
 
 import {
   FaPython,
@@ -190,7 +191,13 @@ function App() {
       {/* --- Hero Section --- */}
       <header className="container mx-auto text-center py-20 md:py-32 px-6">
         <h2 className="text-4xl md:text-6xl font-bold mb-4 animate-on-load animate-fade-in-up delay-200">
-          Upgrade Skill, Wujudkan Proyek.
+          <Typewriter
+            options={{
+              strings: ["Upgrade Skill, Wujudkan Proyek"],
+              autoStart: true,
+              loop: true,
+            }}
+          />
         </h2>
         <p className="text-lg md:text-xl text-gray-300 mb-8 max-w-2xl mx-auto animate-on-load animate-fade-in-up delay-400">
           Nexfora adalah platform terpadu untuk memesan kelas coding berkualitas
@@ -203,35 +210,6 @@ function App() {
           Mulai Jelajahi
         </a>
       </header>
-
-      {/* --- Section Team --- */}
-      <section id="team" className="container mx-auto p-6 pb-20">
-        <h3 className="text-3xl font-bold text-center mb-4 animate-on-load animate-fade-in-up delay-200">
-          Core Team of Nexfora
-        </h3>
-        <p className="text-center text-gray-300 mb-12 max-w-2xl mx-auto animate-on-load animate-fade-in-up delay-300">
-          Kenalan dengan orang-orang hebat di balik kesuksesan Nexfora
-        </p>
-
-        {/* Grid responsif - 4 kolom di desktop, 2 di tablet, 1 di mobile */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
-          {teamMembers.map((member, index) => (
-            <div
-              key={index}
-              className={`animate-on-load animate-fade-in delay-${
-                (index + 4) * 100
-              }`}
-            >
-              <TeamCard
-                name={member.name}
-                role={member.role}
-                photo={member.photo}
-                description={member.description}
-              />
-            </div>
-          ))}
-        </div>
-      </section>
 
       {/* --- Section Kelas --- */}
       <section id="kelas" className="container mx-auto p-6 pb-12">
@@ -283,6 +261,35 @@ function App() {
                 price={item.price}
                 icon={item.icon}
                 whatsappNumber="6285831163191"
+              />
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* --- Section Team --- */}
+      <section id="team" className="container mx-auto p-6 pb-20">
+        <h3 className="text-3xl font-bold text-center mb-4 animate-on-load animate-fade-in-up delay-200">
+          Core Team of Nexfora
+        </h3>
+        <p className="text-center text-gray-300 mb-12 max-w-2xl mx-auto animate-on-load animate-fade-in-up delay-300">
+          Kenalan dengan orang-orang hebat di balik kesuksesan Nexfora
+        </p>
+
+        {/* Grid responsif - 4 kolom di desktop, 2 di tablet, 1 di mobile */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
+          {teamMembers.map((member, index) => (
+            <div
+              key={index}
+              className={`animate-on-load animate-fade-in delay-${
+                (index + 4) * 100
+              }`}
+            >
+              <TeamCard
+                name={member.name}
+                role={member.role}
+                photo={member.photo}
+                description={member.description}
               />
             </div>
           ))}

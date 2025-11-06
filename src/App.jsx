@@ -204,7 +204,7 @@ function App() {
           dan jasa pembuatan website profesional.
         </p>
         <a
-          href="#team"
+          href="#kelas"
           className="inline-block bg-linear-to-r from-blue-500 to-purple-600 hover:from-blue-400 hover:to-purple-500 text-white font-bold py-3 px-8 rounded-full text-lg transition-all duration-300 hover:scale-110 hover:shadow-2xl hover:shadow-purple-500/50 animate-on-load animate-scale-in delay-600 glow-on-hover"
         >
           Mulai Jelajahi

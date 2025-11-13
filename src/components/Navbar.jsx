@@ -20,17 +20,14 @@ const Navbar = ({ mobileMenuOpen, setMobileMenuOpen }) => {
             <Link to="/about" className="nav-link hover:text-blue-400 transition-all duration-300 hover:scale-110 font-medium">
               About
             </Link>
+            <Link to="/courses" className="nav-link hover:text-blue-400 transition-all duration-300 hover:scale-110 font-medium">
+              Kelas
+            </Link>
             <a
               href="#team"
               className="nav-link hover:text-blue-400 transition-all duration-300 hover:scale-110 font-medium"
             >
               Team
-            </a>
-            <a
-              href="#kelas"
-              className="nav-link hover:text-blue-400 transition-all duration-300 hover:scale-110 font-medium"
-            >
-              Kelas
             </a>
             <a
               href="#jasa"
@@ -72,19 +69,19 @@ const Navbar = ({ mobileMenuOpen, setMobileMenuOpen }) => {
             >
               About
             </Link>
+            <Link
+              to="/courses"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block w-full text-left py-3 px-4 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-all duration-300 hover:translate-x-2 font-medium"
+            >
+              Kelas
+            </Link>
             <a
               href="#team"
               onClick={() => setMobileMenuOpen(false)}
               className="block w-full text-left py-3 px-4 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-all duration-300 hover:translate-x-2 font-medium"
             >
               Team
-            </a>
-            <a
-              href="#kelas"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block w-full text-left py-3 px-4 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-all duration-300 hover:translate-x-2 font-medium"
-            >
-              Kelas
             </a>
             <a
               href="#jasa"

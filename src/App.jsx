@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import ProductCard from "./components/ProductCard";
 import TeamCard from "./components/TeamCard";
 import Login from "./components/Login";
+import Register from "./components/Register";
 import Typewriter from "typewriter-effect";
 
 import { FaCode, FaBars, FaTimes, FaPaintBrush } from "react-icons/fa";
@@ -9,13 +10,7 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 
 function App() {
-  const [showLogin, setShowLogin] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  // If login page is active, show it
-  if (showLogin) {
-    return <Login onBack={() => setShowLogin(false)} />;
-  }
   // Daftar Jasa
   const jasa = [
     {

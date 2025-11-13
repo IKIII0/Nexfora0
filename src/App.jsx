@@ -92,8 +92,6 @@ function App() {
   return (
     <div className="min-h-screen bg-linear-to-br from-gray-900 via-black to-blue-950 text-white font-sans">
       <Navbar
-        showLogin={showLogin}
-        setShowLogin={setShowLogin}
         mobileMenuOpen={mobileMenuOpen}
         setMobileMenuOpen={setMobileMenuOpen}
       />

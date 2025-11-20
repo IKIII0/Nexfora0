@@ -1,3 +1,4 @@
+// Navbar.jsx
 import { FaBars, FaTimes } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
@@ -23,18 +24,18 @@ const Navbar = ({ mobileMenuOpen, setMobileMenuOpen }) => {
             <Link to="/courses" className="nav-link hover:text-blue-400 transition-all duration-300 hover:scale-110 font-medium">
               Kelas
             </Link>
-            <a
-              href="#team"
+            <Link 
+              to="/about#team" 
               className="nav-link hover:text-blue-400 transition-all duration-300 hover:scale-110 font-medium"
             >
               Team
-            </a>
-            <a
-              href="#jasa"
+            </Link>
+            <Link 
+              to="/jasa"
               className="nav-link hover:text-blue-400 transition-all duration-300 hover:scale-110 font-medium"
             >
               Jasa
-            </a>
+            </Link>
             <Link
               to="/login"
               className="bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 px-6 py-2 rounded-full transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-blue-500/50 font-semibold"
@@ -76,20 +77,20 @@ const Navbar = ({ mobileMenuOpen, setMobileMenuOpen }) => {
             >
               Kelas
             </Link>
-            <a
-              href="#team"
+            <Link 
+              to="/about#team" 
               onClick={() => setMobileMenuOpen(false)}
               className="block w-full text-left py-3 px-4 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-all duration-300 hover:translate-x-2 font-medium"
             >
               Team
-            </a>
-            <a
-              href="#jasa"
+            </Link>
+            <Link 
+              to="/jasa"
               onClick={() => setMobileMenuOpen(false)}
               className="block w-full text-left py-3 px-4 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-all duration-300 hover:translate-x-2 font-medium"
             >
               Jasa
-            </a>
+            </Link>
             <Link
               to="/login"
               onClick={() => setMobileMenuOpen(false)}

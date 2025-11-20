@@ -6,19 +6,36 @@ import {
   FaEyeSlash,
   FaGoogle,
 } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Hanya tampilan - kembali ke homepage setelah submit
+    // Hanya tampilan - simulasi login dan kembali ke homepage setelah submit
+    sessionStorage.setItem(
+      "nexfora_user",
+      JSON.stringify({ email })
+    );
     alert(`Login sebagai: ${email}`);
-    navigate("/");
+    const redirectState = location.state;
+    if (redirectState?.from === "/pesan") {
+      navigate("/pesan", {
+        state: redirectState.booking
+          ? {
+              type: redirectState.booking.type,
+              item: redirectState.booking.item,
+            }
+          : undefined,
+      });
+    } else {
+      navigate("/");
+    }
   };
 
   return (

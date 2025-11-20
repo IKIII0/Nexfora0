@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import ProductCard from "../components/ProductCard";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -6,6 +7,7 @@ import { FaPython, FaBook } from "react-icons/fa";
 
 function Courses() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   // Daftar Kelas
   const kelas = [
@@ -24,6 +26,28 @@ function Courses() {
       icon: <FaBook className="text-purple-400" size={32} />,
     },
   ];
+
+  const handleBookClass = (item) => {
+    const user = sessionStorage.getItem("nexfora_user");
+    if (!user) {
+      navigate("/login", {
+        state: {
+          from: "/pesan",
+          booking: {
+            type: "kelas",
+            item,
+          },
+        },
+      });
+    } else {
+      navigate("/pesan", {
+        state: {
+          type: "kelas",
+          item,
+        },
+      });
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-blue-950 text-white font-sans">
@@ -67,6 +91,7 @@ function Courses() {
                 price={item.price}
                 icon={item.icon}
                 whatsappNumber="6282273875270"
+                onBook={() => handleBookClass(item)}
               />
             </div>
           ))}

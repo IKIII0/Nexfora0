@@ -1,5 +1,5 @@
-// Jasa.jsx
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import ProductCard from "../components/ProductCard";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -24,6 +24,29 @@ const Jasa = () => {
   ];
 
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+  const navigate = useNavigate();
+
+  const handleBookService = (item) => {
+    const user = sessionStorage.getItem("nexfora_user");
+    if (!user) {
+      navigate("/login", {
+        state: {
+          from: "/pesan",
+          booking: {
+            type: "jasa",
+            item,
+          },
+        },
+      });
+    } else {
+      navigate("/pesan", {
+        state: {
+          type: "jasa",
+          item,
+        },
+      });
+    }
+  };
 
   return (
     <div className="min-h-screen bg-linear-to-br from-gray-900 via-black to-blue-950 text-white font-sans">
@@ -50,6 +73,7 @@ const Jasa = () => {
                 price={item.price}
                 icon={item.icon}
                 whatsappNumber="6285831163191"
+                onBook={() => handleBookService(item)}
               />
             </div>
           ))}

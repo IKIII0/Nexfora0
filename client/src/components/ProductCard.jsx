@@ -6,6 +6,7 @@ const ProductCard = ({
   price,
   icon,
   whatsappNumber = "6281234567890",
+  onBook,
 }) => {
   // Fungsi untuk membuka WhatsApp dengan pesan otomatis
   const handleWhatsAppClick = () => {
@@ -29,12 +30,22 @@ const ProductCard = ({
       <p className="text-gray-300 mb-4 grow">{description}</p>
       <div>
         <p className="text-lg font-medium text-blue-300 mb-4">{price}</p>
-        <button
-          onClick={handleWhatsAppClick}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-blue-500/50"
-        >
-          Pesan Sekarang
-        </button>
+        <div className="space-y-3">
+          <button
+            onClick={handleWhatsAppClick}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-blue-500/50"
+          >
+            Pesan via WhatsApp
+          </button>
+          {onBook && (
+            <button
+              onClick={onBook}
+              className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-full transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-purple-500/50"
+            >
+              Pesan di Nexfora
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

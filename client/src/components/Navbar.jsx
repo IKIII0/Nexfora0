@@ -1,20 +1,19 @@
 import { FaBars, FaTimes } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import React, { useState, useEffect } from "react"; 
+import React, { useState, useEffect } from "react";
 
 const Navbar = ({ mobileMenuOpen, setMobileMenuOpen }) => {
   // State sementara untuk mensimulasikan status login
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userName, setUserName] = useState("Budi Santoso"); 
-  useEffect(() => {
-  }, []);
+  const [userName, setUserName] = useState("Budi Santoso");
+  useEffect(() => {}, []);
 
   const toggleLogin = () => {
     setIsLoggedIn(!isLoggedIn);
     if (isLoggedIn) {
-      setUserName(""); 
+      setUserName("");
     } else {
-      setUserName("Budi Santoso"); 
+      setUserName("Budi Santoso");
     }
   };
 
@@ -30,20 +29,23 @@ const Navbar = ({ mobileMenuOpen, setMobileMenuOpen }) => {
           </Link>
 
           <div className="hidden md:flex space-x-8 items-center">
-            <Link to="/" className="nav-link hover:text-blue-400 transition-all duration-300 hover:scale-110 font-medium">
-              Home
-            </Link>
-            <Link to="/about" className="nav-link hover:text-blue-400 transition-all duration-300 hover:scale-110 font-medium">
-              About
-            </Link>
-            <Link to="/courses" className="nav-link hover:text-blue-400 transition-all duration-300 hover:scale-110 font-medium">
-              Kelas
-            </Link>
             <Link
-              to="/about#team"
+              to="/"
               className="nav-link hover:text-blue-400 transition-all duration-300 hover:scale-110 font-medium"
             >
-              Team
+              Home
+            </Link>
+            <Link
+              to="/about"
+              className="nav-link hover:text-blue-400 transition-all duration-300 hover:scale-110 font-medium"
+            >
+              About
+            </Link>
+            <Link
+              to="/courses"
+              className="nav-link hover:text-blue-400 transition-all duration-300 hover:scale-110 font-medium"
+            >
+              Kelas
             </Link>
             <Link
               to="/jasa"
@@ -54,9 +56,9 @@ const Navbar = ({ mobileMenuOpen, setMobileMenuOpen }) => {
 
             {isLoggedIn ? (
               <Link
-                to="/profile" 
+                to="/profile"
                 className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 px-6 py-2 rounded-full transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-blue-500/50 font-semibold"
-                onClick={() => setMobileMenuOpen(false)} 
+                onClick={() => setMobileMenuOpen(false)}
               >
                 {userName}
               </Link>
@@ -113,13 +115,6 @@ const Navbar = ({ mobileMenuOpen, setMobileMenuOpen }) => {
               Kelas
             </Link>
             <Link
-              to="/about#team"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block w-full text-left py-3 px-4 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-all duration-300 hover:translate-x-2 font-medium"
-            >
-              Team
-            </Link>
-            <Link
               to="/jasa"
               onClick={() => setMobileMenuOpen(false)}
               className="block w-full text-left py-3 px-4 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-all duration-300 hover:translate-x-2 font-medium"
@@ -146,7 +141,7 @@ const Navbar = ({ mobileMenuOpen, setMobileMenuOpen }) => {
             <button
               onClick={() => {
                 toggleLogin();
-                setMobileMenuOpen(false); 
+                setMobileMenuOpen(false);
               }}
               className="w-full text-left bg-gray-600 hover:bg-gray-500 text-white px-4 py-3 rounded-lg text-sm mt-2"
             >

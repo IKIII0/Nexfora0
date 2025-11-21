@@ -1,4 +1,6 @@
 import React from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { authService } from "../services/authService";
 
 const ProductCard = ({
   title,
@@ -6,7 +8,6 @@ const ProductCard = ({
   price,
   icon,
   whatsappNumber = "6281234567890",
-  onBook,
 }) => {
   // Fungsi untuk membuka WhatsApp dengan pesan otomatis
   const handleWhatsAppClick = () => {
@@ -15,6 +16,18 @@ const ProductCard = ({
     );
     const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${message}`;
     window.open(whatsappUrl, "_blank");
+  };
+
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleBookClick = () => {
+    if (!authService.isAuthenticated()) {
+      navigate("/login", { state: { from: location.pathname } });
+      return;
+    } else {
+      navigate("/pesan")
+    }
   };
 
   return (
@@ -37,9 +50,9 @@ const ProductCard = ({
           >
             Pesan via WhatsApp
           </button>
-          {onBook && (
+          {(
             <button
-              onClick={onBook}
+              onClick={handleBookClick}
               className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-full transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-purple-500/50"
             >
               Pesan di Nexfora

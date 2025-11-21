@@ -1,13 +1,8 @@
 // Register.jsx
 import React, { useState } from "react";
-import {
-  FaUser,
-  FaEnvelope,
-  FaLock,
-  FaEye,
-  FaEyeSlash,
-} from "react-icons/fa";
+import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { authService } from "../services/authService";
 
 function Register() {
   const [name, setName] = useState("");
@@ -17,20 +12,34 @@ function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setIsLoading(true);
 
     if (password !== confirmPassword) {
       setError("Konfirmasi password tidak cocok");
+      setIsLoading(false);
       return;
     }
 
-    // Simulasi registrasi berhasil
-    alert(`Registrasi berhasil untuk: ${name} (${email})`);
-    navigate("/login");
+    try {
+      const response = await authService.register(
+        name,
+        email,
+        password,
+        confirmPassword
+      );
+      alert("Registrasi berhasil! Silakan login dengan akun Anda.");
+      navigate("/login");
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -38,7 +47,6 @@ function Register() {
       <div className="w-full max-w-md">
         {/* Logo/Brand + Back */}
         <div className="relative text-center mb-8 animate-on-load animate-fade-in-down">
-          
           <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-linear-to-r from-blue-400 to-purple-500 mb-2 hover:opacity-80 transition-opacity">
             Nexfora
           </h1>
@@ -159,16 +167,15 @@ function Register() {
             </div>
 
             {/* Error Message */}
-            {error && (
-              <p className="text-red-400 text-sm">{error}</p>
-            )}
+            {error && <p className="text-red-400 text-sm">{error}</p>}
 
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full bg-linear-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-3 rounded-lg transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
+              disabled={isLoading}
+              className="w-full bg-linear-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 disabled:from-gray-600 disabled:to-gray-700 text-white font-bold py-3 rounded-lg transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] disabled:transform-none disabled:cursor-not-allowed"
             >
-              Daftar
+              {isLoading ? "Sedang Mendaftar..." : "Daftar"}
             </button>
           </form>
 
@@ -204,7 +211,7 @@ function Register() {
           </p>
         </div>
         <div className="text-center mt-6 animate-on-load animate-fade-in delay-400">
-            <button
+          <button
             onClick={() => navigate("/login")}
             className="left-0 top-1 text-gray-400 hover:text-gray-300 text-sm transition-all hover:translate-x-[-4px] duration-300"
           >

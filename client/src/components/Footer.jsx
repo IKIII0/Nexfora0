@@ -99,14 +99,14 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <a
-                  href="#jasa"
+                <Link
+                  to="/jasa"
                   className="text-gray-400 hover:text-blue-400 transition-colors duration-300 text-sm flex items-center group"
                 >
                   <span className="group-hover:translate-x-1 transition-transform duration-300">
                     Jasa
                   </span>
-                </a>
+                </Link>
               </li>
               <li>
                 <Link

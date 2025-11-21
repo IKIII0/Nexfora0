@@ -7,34 +7,47 @@ import {
   FaGoogle,
 } from "react-icons/fa";
 import { useLocation, useNavigate } from "react-router-dom";
+import { authService } from "../services/authService";
 
 function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Hanya tampilan - simulasi login dan kembali ke homepage setelah submit
-    sessionStorage.setItem(
-      "nexfora_user",
-      JSON.stringify({ email })
-    );
-    alert(`Login sebagai: ${email}`);
-    const redirectState = location.state;
-    if (redirectState?.from === "/pesan") {
-      navigate("/pesan", {
-        state: redirectState.booking
-          ? {
-              type: redirectState.booking.type,
-              item: redirectState.booking.item,
-            }
-          : undefined,
-      });
-    } else {
-      navigate("/");
+    setError("");
+    setIsLoading(true);
+
+    try {
+      const response = await authService.login(email, password);
+
+      // Simpan token dan data user
+      authService.setToken(response.token);
+      authService.setUser({ email, role: response.role });
+
+      // Redirect berdasarkan role atau halaman sebelumnya
+      const redirectState = location.state;
+      if (redirectState?.from === "/pesan") {
+        navigate("/pesan", {
+          state: redirectState.booking
+            ? {
+                type: redirectState.booking.type,
+                item: redirectState.booking.item,
+              }
+            : undefined,
+        });
+      } else {
+        navigate("/");
+      }
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -43,7 +56,7 @@ function Login() {
       <div className="w-full max-w-md">
         {/* Logo/Brand + Back */}
         <div className="relative text-center mb-8 animate-on-load animate-fade-in-down">
-          
+
           <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-linear-to-r from-blue-400 to-purple-500 mb-2 hover:opacity-80 transition-opacity">
             Nexfora
           </h1>
@@ -125,12 +138,20 @@ function Login() {
               </a>
             </div>
 
+            {/* Error Message */}
+            {error && (
+              <p className="text-red-400 text-sm text-center bg-red-900/20 border border-red-800 rounded-lg p-3">
+                {error}
+              </p>
+            )}
+
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full bg-linear-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-3 rounded-lg transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
+              disabled={isLoading}
+              className="w-full bg-linear-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 disabled:from-gray-600 disabled:to-gray-700 text-white font-bold py-3 rounded-lg transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] disabled:transform-none disabled:cursor-not-allowed"
             >
-              Masuk
+              {isLoading ? "Sedang Masuk..." : "Masuk"}
             </button>
           </form>
 

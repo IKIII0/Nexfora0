@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 /* Smooth scroll behavior */
 html {
@@ -121,15 +119,15 @@ html {
   .delay-100 {
     animation-delay: 0.1s;
   }
-  
+
   .delay-200 {
     animation-delay: 0.2s;
   }
-  
+
   .delay-300 {
     animation-delay: 0.3s;
   }
-  
+
   .delay-400 {
     animation-delay: 0.4s;
   }
@@ -162,7 +160,7 @@ html {
   }
 
   .nav-link::after {
-    content: '';
+    content: "";
     position: absolute;
     bottom: -4px;
     left: 0;

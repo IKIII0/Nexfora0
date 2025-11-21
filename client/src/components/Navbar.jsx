@@ -15,22 +15,25 @@ const Navbar = ({ mobileMenuOpen, setMobileMenuOpen }) => {
           </Link>
 
           <div className="hidden md:flex space-x-8 items-center">
-            <Link to="/" className="nav-link hover:text-blue-400 transition-all duration-300 hover:scale-110 font-medium">
-              Home
-            </Link>
-            <Link to="/about" className="nav-link hover:text-blue-400 transition-all duration-300 hover:scale-110 font-medium">
-              About
-            </Link>
-            <Link to="/courses" className="nav-link hover:text-blue-400 transition-all duration-300 hover:scale-110 font-medium">
-              Kelas
-            </Link>
-            <Link 
-              to="/about#team" 
+            <Link
+              to="/"
               className="nav-link hover:text-blue-400 transition-all duration-300 hover:scale-110 font-medium"
             >
-              Team
+              Home
             </Link>
-            <Link 
+            <Link
+              to="/about"
+              className="nav-link hover:text-blue-400 transition-all duration-300 hover:scale-110 font-medium"
+            >
+              About
+            </Link>
+            <Link
+              to="/courses"
+              className="nav-link hover:text-blue-400 transition-all duration-300 hover:scale-110 font-medium"
+            >
+              Kelas
+            </Link>
+            <Link
               to="/jasa"
               className="nav-link hover:text-blue-400 transition-all duration-300 hover:scale-110 font-medium"
             >
@@ -77,14 +80,14 @@ const Navbar = ({ mobileMenuOpen, setMobileMenuOpen }) => {
             >
               Kelas
             </Link>
-            <Link 
-              to="/about#team" 
+            <Link
+              to="/about#team"
               onClick={() => setMobileMenuOpen(false)}
               className="block w-full text-left py-3 px-4 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-all duration-300 hover:translate-x-2 font-medium"
             >
               Team
             </Link>
-            <Link 
+            <Link
               to="/jasa"
               onClick={() => setMobileMenuOpen(false)}
               className="block w-full text-left py-3 px-4 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-all duration-300 hover:translate-x-2 font-medium"

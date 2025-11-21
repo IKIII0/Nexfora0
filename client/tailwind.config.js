@@ -3,7 +3,7 @@
 export default {
   content: [
     "./index.html",
-    "./client/src/**/*.{js,ts,jsx,tsx}", // Arahkan ke semua file JS/JSX di folder client/src
+    "./src/**/*.{js,ts,jsx,tsx}", // Mengarah ke folder src yang benar
   ],
   theme: {
     extend: {},

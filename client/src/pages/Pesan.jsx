@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -13,16 +13,36 @@ const Pesan = () => {
 
   const [tipe, setTipe] = useState(selectedType);
   const [paket, setPaket] = useState(selectedItem?.title || "");
-  const [harga, setHarga] = useState(selectedItem?.price || "");
+  // const [harga, setHarga] = useState(selectedItem?.price || "");
   const [nama, setNama] = useState("");
+  const [paketOptions, setPaketOptions] = useState([]);
   const [email, setEmail] = useState("");
   const [catatan, setCatatan] = useState("");
 
+  useEffect(() => {
+    if (tipe === 'kelas') {
+      setPaketOptions([
+        { value: 'Python', label: 'Python' },
+        { value: 'Dasar Pemrograman', label: 'Dasar Pemrograman' }
+      ]);
+      setPaket('Python');
+    } else if (tipe === 'jasa') {
+      setPaketOptions([
+        { value: 'Jasa Website', label: 'Jasa Website' },
+        { value: 'Desain', label: 'Desain' }
+      ]);
+      setPaket('Jasa Website');
+    } else {
+      setPaketOptions([]);
+      setPaket('');
+    }
+  }, [tipe]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    alert(
-      `Pemesanan berhasil!\n\nTipe: ${tipe}\nPaket: ${paket}\nHarga: ${harga}\nNama: ${nama}\nEmail: ${email}\nCatatan: ${catatan}`
-    );
+    // alert(
+    //   `Pemesanan berhasil!\n\nTipe: ${tipe}\nPaket: ${paket}\nHarga: ${harga}\nNama: ${nama}\nEmail: ${email}\nCatatan: ${catatan}`
+    // );
     navigate("/");
   };
 
@@ -67,28 +87,22 @@ const Pesan = () => {
             <label className="block mb-2 text-sm font-medium text-gray-300">
               Nama Paket
             </label>
-            <input
-              type="text"
+            <select
               className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={paket}
               onChange={(e) => setPaket(e.target.value)}
-              placeholder="Contoh: Kelas Python Lengkap"
               required
-            />
-          </div>
-
-          <div>
-            <label className="block mb-2 text-sm font-medium text-gray-300">
-              Harga
-            </label>
-            <input
-              type="text"
-              className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={harga}
-              onChange={(e) => setHarga(e.target.value)}
-              placeholder="Contoh: Rp 100.000"
-              required
-            />
+              disabled={!tipe}
+            >
+              <option value="" disabled>
+                {tipe ? 'Pilih paket' : 'Pilih tipe terlebih dahulu'}
+              </option>
+              {paketOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

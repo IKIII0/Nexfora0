@@ -87,13 +87,21 @@ const Pesan = () => {
       console.log('Sending order data:', orderData);
       console.log('Token:', token ? 'Present' : 'Missing');
       
-      const data = await apiPost('/orders', orderData, token);
+      const response = await apiPost('/orders', orderData, token);
+      const orderId = response.data._id; // Pastikan backend mengembalikan ID order
 
-      // Success - navigate to profile with success message
-      navigate('/profile', { 
+      // Navigate to payment page with order data
+      navigate('/payment', { 
         state: { 
-          success: 'Pesanan berhasil dibuat!',
-          newOrder: data.data 
+          orderData: {
+            _id: orderId,
+            tipe_pemesanan: tipe,
+            nama_paket: paket,
+            total: harga,
+            catatan,
+            nama_lengkap: nama,
+            email
+          }
         } 
       });
 
@@ -237,4 +245,3 @@ const Pesan = () => {
 };
 
 export default Pesan;
-

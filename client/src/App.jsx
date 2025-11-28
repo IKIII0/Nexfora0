@@ -10,6 +10,7 @@ import Login from "./components/Login";
 import Register from "./components/Register";
 import ApiTest from "./debug/ApiTest";
 import EnvTest from "./pages/EnvTest";
+import Payment from "./pages/Payment.jsx";
 import "./index.css";
 
 // Komponen untuk memproteksi route
@@ -31,6 +32,7 @@ function App() {
       <Route path="/pesan" element={<Pesan />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/payment" element={<Payment />} />
       <Route path="/debug" element={<ApiTest />} />
       <Route path="/env-test" element={<EnvTest />} />
       <Route 

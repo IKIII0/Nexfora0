@@ -13,6 +13,12 @@ const authenticateToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
+  console.log('=== Token Authentication Debug ===');
+  console.log('Auth Header:', authHeader);
+  console.log('Token extracted:', token ? `${token.substring(0, 20)}...` : 'null');
+  console.log('JWT_SECRET exists:', !!process.env.JWT_SECRET);
+  console.log('JWT_SECRET value:', process.env.JWT_SECRET);
+
   if (!token) {
     return res.status(401).json({
       status: "error",
@@ -23,12 +29,18 @@ const authenticateToken = (req, res, next) => {
 
   jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
     if (err) {
+      console.error('JWT Verification Error:', err.name, err.message);
       return res.status(403).json({
         status: "error",
         code: 403,
-        message: "Invalid or expired token"
+        message: "Invalid or expired token",
+        debug: {
+          error: err.name,
+          details: err.message
+        }
       });
     }
+    console.log('Token verified successfully. User:', user);
     req.user = user;
     next();
   });

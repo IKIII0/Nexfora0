@@ -1,5 +1,5 @@
 // API Configuration
-const API_BASE_URL = "https://nexfora0-production.up.railway.app/api";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
 
 export const API_ENDPOINTS = {
   // Auth endpoints

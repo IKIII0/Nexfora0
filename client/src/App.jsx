@@ -5,6 +5,7 @@ import Courses from "./pages/Courses.jsx";
 import Jasa from "./pages/Jasa.jsx";
 import Pesan from "./pages/Pesan.jsx";
 import UserProfile from "./pages/UserProfile";
+import OrderDetail from "./pages/OrderDetail";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import "./index.css";
@@ -33,6 +34,14 @@ function App() {
         element={
           <ProtectedRoute>
             <UserProfile />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/order/:orderId" 
+        element={
+          <ProtectedRoute>
+            <OrderDetail />
           </ProtectedRoute>
         } 
       />

@@ -2,22 +2,37 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { apiPost } from "../utils/apiHelpers";
 
 const Pesan = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const selectedType = location.state?.type || "";
   const selectedItem = location.state?.item || null;
 
   const [tipe, setTipe] = useState(selectedType);
   const [paket, setPaket] = useState(selectedItem?.title || "");
-  // const [harga, setHarga] = useState(selectedItem?.price || "");
+  const [harga, setHarga] = useState(selectedItem?.price || 0);
   const [nama, setNama] = useState("");
   const [paketOptions, setPaketOptions] = useState([]);
   const [email, setEmail] = useState("");
   const [catatan, setCatatan] = useState("");
+
+  // Pricing configuration
+  const pricing = {
+    'kelas': {
+      'Python': 250000,
+      'Dasar Pemrograman': 180000
+    },
+    'jasa': {
+      'Jasa Website': 1500000,
+      'Desain': 800000
+    }
+  };
 
   useEffect(() => {
     if (tipe === 'kelas') {
@@ -38,12 +53,50 @@ const Pesan = () => {
     }
   }, [tipe]);
 
-  const handleSubmit = (e) => {
+  // Update harga when paket changes
+  useEffect(() => {
+    if (tipe && paket) {
+      setHarga(pricing[tipe]?.[paket] || 0);
+    }
+  }, [tipe, paket, pricing]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // alert(
-    //   `Pemesanan berhasil!\n\nTipe: ${tipe}\nPaket: ${paket}\nHarga: ${harga}\nNama: ${nama}\nEmail: ${email}\nCatatan: ${catatan}`
-    // );
-    navigate("/");
+    setIsLoading(true);
+    setError("");
+
+    // Get token from localStorage
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setError("Anda harus login terlebih dahulu");
+      setIsLoading(false);
+      navigate('/login');
+      return;
+    }
+
+    try {
+      const data = await apiPost('/orders', {
+        tipe_pemesanan: tipe,
+        nama_paket: paket,
+        total: harga,
+        catatan,
+        nama_lengkap: nama,
+        email
+      }, token);
+
+      // Success - navigate to profile with success message
+      navigate('/profile', { 
+        state: { 
+          success: 'Pesanan berhasil dibuat!',
+          newOrder: data.data 
+        } 
+      });
+
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -65,6 +118,12 @@ const Pesan = () => {
           onSubmit={handleSubmit}
           className="bg-gray-900/60 border border-gray-700/60 rounded-2xl p-8 shadow-xl space-y-6"
         >
+          {error && (
+            <div className="bg-red-500/20 border border-red-500 text-red-300 px-4 py-3 rounded-lg">
+              {error}
+            </div>
+          )}
+
           <div>
             <label className="block mb-2 text-sm font-medium text-gray-300">
               Tipe Pemesanan
@@ -74,6 +133,7 @@ const Pesan = () => {
               value={tipe}
               onChange={(e) => setTipe(e.target.value)}
               required
+              disabled={isLoading}
             >
               <option value="" disabled>
                 Pilih tipe
@@ -92,7 +152,7 @@ const Pesan = () => {
               value={paket}
               onChange={(e) => setPaket(e.target.value)}
               required
-              disabled={!tipe}
+              disabled={!tipe || isLoading}
             >
               <option value="" disabled>
                 {tipe ? 'Pilih paket' : 'Pilih tipe terlebih dahulu'}
@@ -105,6 +165,14 @@ const Pesan = () => {
             </select>
           </div>
 
+          {harga > 0 && (
+            <div className="bg-blue-900/30 border border-blue-700/50 rounded-lg p-4">
+              <p className="text-blue-300 font-medium">
+                Total Harga: <span className="text-xl font-bold text-blue-400">Rp {harga.toLocaleString('id-ID')}</span>
+              </p>
+            </div>
+          )}
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block mb-2 text-sm font-medium text-gray-300">
@@ -116,6 +184,7 @@ const Pesan = () => {
                 value={nama}
                 onChange={(e) => setNama(e.target.value)}
                 required
+                disabled={isLoading}
               />
             </div>
             <div>
@@ -128,6 +197,7 @@ const Pesan = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                disabled={isLoading}
               />
             </div>
           </div>
@@ -141,14 +211,16 @@ const Pesan = () => {
               value={catatan}
               onChange={(e) => setCatatan(e.target.value)}
               placeholder="Tuliskan kebutuhan atau preferensi khusus Anda di sini"
+              disabled={isLoading}
             />
           </div>
 
           <button
             type="submit"
-            className="w-full bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold py-3 rounded-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:shadow-purple-500/40"
+            disabled={isLoading}
+            className="w-full bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold py-3 rounded-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:shadow-purple-500/40 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
-            Konfirmasi Pemesanan
+            {isLoading ? 'Memproses...' : 'Konfirmasi Pemesanan'}
           </button>
         </form>
       </section>

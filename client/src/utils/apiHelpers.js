@@ -70,6 +70,8 @@ export const apiGet = async (endpoint, token) => {
  * POST request with authentication
  */
 export const apiPost = async (endpoint, data, token) => {
+  console.log('API POST Request:', { endpoint, data, hasToken: !!token });
+  
   return authenticatedApiFetch(
     `${API_BASE_URL}${endpoint}`, 
     {

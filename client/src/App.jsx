@@ -8,6 +8,7 @@ import UserProfile from "./pages/UserProfile";
 import OrderDetail from "./pages/OrderDetail";
 import Login from "./components/Login";
 import Register from "./components/Register";
+import ApiTest from "./debug/ApiTest";
 import "./index.css";
 
 // Komponen untuk memproteksi route
@@ -29,6 +30,7 @@ function App() {
       <Route path="/pesan" element={<Pesan />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/debug" element={<ApiTest />} />
       <Route 
         path="/profile" 
         element={

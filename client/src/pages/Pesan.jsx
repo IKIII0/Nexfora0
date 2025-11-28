@@ -75,14 +75,19 @@ const Pesan = () => {
     }
 
     try {
-      const data = await apiPost('/orders', {
+      const orderData = {
         tipe_pemesanan: tipe,
         nama_paket: paket,
         total: harga,
         catatan,
         nama_lengkap: nama,
         email
-      }, token);
+      };
+      
+      console.log('Sending order data:', orderData);
+      console.log('Token:', token ? 'Present' : 'Missing');
+      
+      const data = await apiPost('/orders', orderData, token);
 
       // Success - navigate to profile with success message
       navigate('/profile', { 
@@ -93,6 +98,7 @@ const Pesan = () => {
       });
 
     } catch (err) {
+      console.error('Order creation error:', err);
       setError(err.message);
     } finally {
       setIsLoading(false);

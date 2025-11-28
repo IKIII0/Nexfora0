@@ -37,7 +37,20 @@ const authenticateToken = (req, res, next) => {
 // Create new order
 async function createNewOrder(req, res) {
   try {
+    console.log('Request body:', req.body);
+    console.log('User from token:', req.user);
+    
     const userId = req.user.id;
+    
+    // Check if req.body exists
+    if (!req.body || Object.keys(req.body).length === 0) {
+      return res.status(400).json({
+        status: "error",
+        code: 400,
+        message: "Request body is empty or missing"
+      });
+    }
+    
     const { tipe_pemesanan, nama_paket, total, catatan, nama_lengkap, email } = req.body;
 
     // Validate required fields

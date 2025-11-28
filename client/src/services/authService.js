@@ -12,6 +12,14 @@ export const authService = {
         body: JSON.stringify({ email, password }),
       });
 
+      // Check if response is JSON
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        console.error('Non-JSON response:', text);
+        throw new Error('Server error: Invalid response format');
+      }
+
       const data = await response.json();
 
       if (!response.ok) {
@@ -20,7 +28,8 @@ export const authService = {
 
       return data;
     } catch (error) {
-      throw new Error(error.message || "Network error");
+      console.error('Login error:', error);
+      throw error;
     }
   },
 
@@ -39,6 +48,14 @@ export const authService = {
         }),
       });
 
+      // Check if response is JSON
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        console.error('Non-JSON response:', text);
+        throw new Error('Server error: Invalid response format');
+      }
+
       const data = await response.json();
 
       if (!response.ok) {
@@ -47,7 +64,8 @@ export const authService = {
 
       return data;
     } catch (error) {
-      throw new Error(error.message || "Network error");
+      console.error('Register error:', error);
+      throw error;
     }
   },
 

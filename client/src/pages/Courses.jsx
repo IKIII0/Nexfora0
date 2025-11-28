@@ -98,11 +98,11 @@ function Courses() {
         </div>
 
         {/* Info Section */}
-        <div className="mt-16 bg-gray-800/30 border border-gray-700/50 rounded-2xl p-8 max-w-4xl mx-auto">
+        <div className="mt-16 bg-gray-800/30 border text-center border-gray-700/50 rounded-2xl p-8 max-w-4xl mx-auto">
           <h2 className="text-3xl font-bold text-white">
             Kelas Coding Premium
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-5">
             <div className="text-center">
               <div className="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl">🎯</span>

@@ -1,5 +1,5 @@
 // API Helper Functions
-const API_BASE_URL = "https://nexfora0-production.up.railway.app/api";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
 
 /**
  * Generic API fetch function with error handling
@@ -10,11 +10,11 @@ const API_BASE_URL = "https://nexfora0-production.up.railway.app/api";
 export const apiFetch = async (url, options = {}) => {
   try {
     const response = await fetch(url, {
+      ...options,
       headers: {
         'Content-Type': 'application/json',
         ...options.headers
-      },
-      ...options
+      }
     });
 
     // Check if response is JSON

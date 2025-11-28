@@ -10,10 +10,12 @@ function ApiTest() {
     setResults(prev => [...prev, { test, result, timestamp: new Date().toLocaleTimeString() }]);
   };
 
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+
   const testBasicAPI = async () => {
     try {
       setLoading(true);
-      const response = await fetch('https://nexfora0-production.up.railway.app/api/test');
+      const response = await fetch(`${API_BASE_URL}/test`);
       const data = await response.json();
       addResult('Basic API Test', { success: true, data, status: response.status });
     } catch (error) {
@@ -26,7 +28,7 @@ function ApiTest() {
   const testAuthAPI = async () => {
     try {
       setLoading(true);
-      const response = await fetch('https://nexfora0-production.up.railway.app/api/auth/test');
+      const response = await fetch(`${API_BASE_URL}/auth/test`);
       const data = await response.json();
       addResult('Auth API Test', { success: true, data, status: response.status });
     } catch (error) {
@@ -100,7 +102,7 @@ function ApiTest() {
       }
       
       // Test token with a simple API call
-      const response = await fetch('https://nexfora0-production.up.railway.app/api/orders', {
+      const response = await fetch(`${API_BASE_URL}/orders`, {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
@@ -137,7 +139,7 @@ function ApiTest() {
       
       console.log('Testing echo with data:', testData);
       
-      const response = await fetch('https://nexfora0-production.up.railway.app/api/echo', {
+      const response = await fetch(`${API_BASE_URL}/echo`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -172,7 +174,7 @@ function ApiTest() {
       
       console.log('Testing POST with data:', testData);
       
-      const response = await fetch('https://nexfora0-production.up.railway.app/api/test-post', {
+      const response = await fetch(`${API_BASE_URL}/test-post`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

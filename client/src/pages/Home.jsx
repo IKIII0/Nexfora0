@@ -37,12 +37,23 @@ function Home() {
     { src: "/img/poster-2.png" },
   ];
 
-
   const testimonials = [
-    { name: "Yasmin", text: "Hasil Desain nya bagus banget sesuai dengan ekspektasi aku." },
-    { name: "Annisa", text: "Pelayanan sangat cepat dan ramah,  revisi nya juga cepat" },
-    { name: "Aldyra", text: "Kelas codingnya mudah dipahami untuk pemula. Recommended!" },
-    { name: "Pocut", text: "Website nya bagus banget. yang buat juga ganteng." },
+    {
+      name: "Yasmin",
+      text: "Hasil Desain nya bagus banget sesuai dengan ekspektasi aku.",
+    },
+    {
+      name: "Annisa",
+      text: "Pelayanan sangat cepat dan ramah,  revisi nya juga cepat",
+    },
+    {
+      name: "Aldyra",
+      text: "Kelas codingnya mudah dipahami untuk pemula. Recommended!",
+    },
+    {
+      name: "Pocut",
+      text: "Website nya bagus banget. yang buat juga ganteng.",
+    },
   ];
 
   // 4. FUNGSI UNTUK MEMBUKA LIGHTBOX
@@ -103,10 +114,18 @@ function Home() {
           <div className="relative mt-8 bg-gray-800/95 backdrop-blur-sm border border-gray-700 rounded-2xl p-6 w-full max-w-4xl mx-auto shadow-2xl z-50 animate-fade-in">
             <div className="flex flex-col gap-6">
               <div className="flex flex-col md:flex-row items-center md:items-start gap-5">
-                <img src="/img/kelas-profil.png" alt="Kelas Profile" className="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover border-4 border-blue-500 flex-shrink-0" />
+                <img
+                  src="/img/kelas-profil.png"
+                  alt="Kelas Profile"
+                  className="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover border-4 border-blue-500 flex-shrink-0"
+                />
                 <div className="text-center md:text-left">
-                  <h3 className="text-2xl font-bold text-white mb-2">Rifki Al Sauqy</h3>
-                  <p className="text-gray-300">Instruktur berpengalaman dengan sertifikat terpercaya.</p>
+                  <h3 className="text-2xl font-bold text-white mb-2">
+                    Rifki Al Sauqy
+                  </h3>
+                  <p className="text-gray-300">
+                    Instruktur berpengalaman dengan sertifikat terpercaya.
+                  </p>
                 </div>
               </div>
 
@@ -120,7 +139,9 @@ function Home() {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   </div>
-                  <p className="text-sm text-gray-300 font-semibold">Sertifikat Web Development</p>
+                  <p className="text-sm text-gray-300 font-semibold">
+                    Sertifikat Machine Learning Bagusde#3
+                  </p>
                 </div>
                 <div className="bg-gray-700/50 rounded-lg p-4 transition hover:bg-gray-700">
                   <div className="w-full h-48 mb-2 overflow-hidden rounded cursor-pointer group">
@@ -131,7 +152,9 @@ function Home() {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   </div>
-                  <p className="text-sm text-gray-300 font-semibold">Sertifikat Mobile Development</p>
+                  <p className="text-sm text-gray-300 font-semibold">
+                    Sertifikat Pemrograman Python Bagusde#2
+                  </p>
                 </div>
               </div>
             </div>
@@ -143,15 +166,25 @@ function Home() {
           <div className="relative mt-8 bg-gray-800/95 backdrop-blur-sm border border-gray-700 rounded-2xl p-6 w-full max-w-4xl mx-auto shadow-2xl z-50 animate-fade-in">
             <div className="flex flex-col gap-6">
               <div className="flex flex-col md:flex-row items-center md:items-start gap-5">
-                <img src="/img/website-profil.png" alt="Website Profile" className="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover border-4 border-purple-500 flex-shrink-0" />
+                <img
+                  src="/img/website-profil.png"
+                  alt="Website Profile"
+                  className="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover border-4 border-purple-500 flex-shrink-0"
+                />
                 <div className="text-center md:text-left">
-                  <h3 className="text-2xl font-bold text-white mb-2">Farhan Prasetyo & Willy Bevan</h3>
-                  <p className="text-gray-300">Developer profesional dengan beragam pengalaman.</p>
+                  <h3 className="text-2xl font-bold text-white mb-2">
+                    Farhan Prasetyo & Willy Bevan
+                  </h3>
+                  <p className="text-gray-300">
+                    Developer profesional dengan beragam pengalaman.
+                  </p>
                 </div>
               </div>
 
               <div className="bg-gray-700/50 rounded-lg p-6">
-                <h4 className="text-lg font-semibold text-white mb-3">Featured Project: Travelio</h4>
+                <h4 className="text-lg font-semibold text-white mb-3">
+                  Featured Project: Travelio
+                </h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="w-full h-56 overflow-hidden rounded-lg border border-gray-600 cursor-pointer group">
                     <img
@@ -180,10 +213,18 @@ function Home() {
           <div className="relative mt-8 bg-gray-800/95 backdrop-blur-sm border border-gray-700 rounded-2xl p-6 w-full max-w-4xl mx-auto shadow-2xl z-50 animate-fade-in">
             <div className="flex flex-col gap-6">
               <div className="flex flex-col md:flex-row items-center md:items-start gap-5">
-                <img src="/img/desain-profil.png" alt="Design Profile" className="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover border-4 border-green-500 flex-shrink-0" />
+                <img
+                  src="/img/desain-profil.png"
+                  alt="Design Profile"
+                  className="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover border-4 border-green-500 flex-shrink-0"
+                />
                 <div className="text-center md:text-left">
-                  <h3 className="text-2xl font-bold text-white mb-2">Yehezkiel Sitanggang</h3>
-                  <p className="text-gray-300">Desainer kreatif spesialis poster dan branding.</p>
+                  <h3 className="text-2xl font-bold text-white mb-2">
+                    Yehezkiel Sitanggang
+                  </h3>
+                  <p className="text-gray-300">
+                    Desainer kreatif spesialis poster dan branding.
+                  </p>
                 </div>
               </div>
 
@@ -197,7 +238,9 @@ function Home() {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   </div>
-                  <p className="text-sm text-gray-300 font-semibold text-center">Event Poster</p>
+                  <p className="text-sm text-gray-300 font-semibold text-center">
+                    Event Poster
+                  </p>
                 </div>
                 <div className="bg-gray-700/50 rounded-lg p-4 transition hover:bg-gray-700">
                   <div className="w-full aspect-[3/4] mb-2 overflow-hidden rounded bg-gray-800 cursor-pointer group">
@@ -208,7 +251,9 @@ function Home() {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   </div>
-                  <p className="text-sm text-gray-300 font-semibold text-center">Banner Design</p>
+                  <p className="text-sm text-gray-300 font-semibold text-center">
+                    Banner Design
+                  </p>
                 </div>
               </div>
             </div>
@@ -226,35 +271,40 @@ function Home() {
            Fungsinya: mendeteksi hover pada seluruh area slider.
         */}
         <div className="flex group [mask-image:_linear-gradient(to_right,transparent_0,_black_128px,_black_calc(100%-128px),transparent_100%)] py-2">
-          
           {/* GROUP 1: Original */}
           {/* Tambahkan: group-hover:[animation-play-state:paused] */}
           <div className="flex animate-loop-scroll gap-6 pr-6 group-hover:[animation-play-state:paused]">
             {testimonials.map((item, index) => (
-              <div 
-                key={`ori-${index}`} 
+              <div
+                key={`ori-${index}`}
                 className="w-72 md:w-80 shrink-0 bg-gray-900/40 border border-gray-800 rounded-2xl p-6 text-left flex flex-col gap-1 hover:scale-[1.02] transition-all duration-300 cursor-pointer"
               >
                 <h1 className="font-medium text-lg text-white">{item.name}</h1>
-                <p className="text-white/70 text-sm leading-relaxed">{item.text}</p>
+                <p className="text-white/70 text-sm leading-relaxed">
+                  {item.text}
+                </p>
               </div>
             ))}
           </div>
 
           {/* GROUP 2: Duplicate */}
           {/* Tambahkan: group-hover:[animation-play-state:paused] */}
-          <div className="flex animate-loop-scroll gap-6 pr-6 group-hover:[animation-play-state:paused]" aria-hidden="true">
+          <div
+            className="flex animate-loop-scroll gap-6 pr-6 group-hover:[animation-play-state:paused]"
+            aria-hidden="true"
+          >
             {testimonials.map((item, index) => (
-              <div 
-                key={`dup-${index}`} 
+              <div
+                key={`dup-${index}`}
                 className="w-72 md:w-80 shrink-0 bg-gray-900/40 border border-gray-800 rounded-2xl p-6 text-left flex flex-col gap-1 hover:scale-[1.02] transition-all duration-300 cursor-pointer"
               >
                 <h1 className="font-medium text-lg text-white">{item.name}</h1>
-                <p className="text-white/70 text-sm leading-relaxed">{item.text}</p>
+                <p className="text-white/70 text-sm leading-relaxed">
+                  {item.text}
+                </p>
               </div>
             ))}
           </div>
-
         </div>
       </div>
       {/* =================================================================================== */}

@@ -13,6 +13,19 @@ app.use(cors({
 
 app.use(express.json());
 
+// Test endpoint without authentication
+app.get("/api/test", (req, res) => {
+  res.json({
+    status: "success",
+    message: "API is working",
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Routes must come before error handlers
+app.use("/api/auth", authRoutes);
+app.use("/api/orders", orderRoutes);
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
@@ -22,17 +35,5 @@ app.use((err, req, res, next) => {
     message: "Internal server error"
   });
 });
-
-// 404 handler
-app.use('*', (req, res) => {
-  res.status(404).json({
-    status: "error", 
-    code: 404,
-    message: "API endpoint not found"
-  });
-});
-
-app.use("/api/auth", authRoutes);
-app.use("/api/orders", orderRoutes);
 
 module.exports = app;

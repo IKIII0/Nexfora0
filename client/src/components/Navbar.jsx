@@ -25,7 +25,7 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="sticky top-0 z-50 bg-gray-900/80 backdrop-blur-lg border-b border-gray-800/50 animate-on-load animate-fade-in-down">
+      <nav className="sticky top-0 z-99 bg-gray-900/80 backdrop-blur-lg border-b border-gray-800/50 animate-on-load animate-fade-in-down">
         <div className="container mx-auto p-6 flex justify-between items-center">
           <Link
             to="/"

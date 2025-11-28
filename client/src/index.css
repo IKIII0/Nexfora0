@@ -1,5 +1,20 @@
 @import "tailwindcss";
 
+/* Tambahkan ini di index.css */
+@keyframes loop-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-100%); }
+}
+
+.animate-loop-scroll {
+  animation: loop-scroll 25s linear infinite;
+}
+
+/* Logic Pause saat Hover */
+.group:hover .animate-loop-scroll {
+  animation-play-state: paused;
+}
+
 /* Smooth scroll behavior */
 html {
   scroll-behavior: smooth;

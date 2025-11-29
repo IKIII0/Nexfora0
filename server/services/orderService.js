@@ -2,15 +2,24 @@ const pool = require("../db");
 
 // Create new order
 async function createOrder(userId, orderData) {
-  const { tipe_pemesanan, nama_paket, total, catatan, nama_lengkap, email } = orderData;
-  
+  const { tipe_pemesanan, nama_paket, total, catatan, nama_lengkap, email } =
+    orderData;
+
   const query = `
     INSERT INTO pemesanan (user_id, tipe_pemesanan, nama_paket, total, catatan, nama_lengkap, email)
     VALUES ($1, $2, $3, $4, $5, $6, $7)
     RETURNING *
   `;
-  
-  const values = [userId, tipe_pemesanan, nama_paket, total, catatan, nama_lengkap, email];
+
+  const values = [
+    userId,
+    tipe_pemesanan,
+    nama_paket,
+    total,
+    catatan,
+    nama_lengkap,
+    email,
+  ];
   const result = await pool.query(query, values);
   return result.rows[0];
 }
@@ -24,7 +33,7 @@ async function getOrdersByUserId(userId) {
     WHERE user_id = $1 
     ORDER BY created_at DESC
   `;
-  
+
   const result = await pool.query(query, [userId]);
   return result.rows;
 }
@@ -37,7 +46,7 @@ async function getOrderById(orderId) {
     FROM pemesanan 
     WHERE id_pesanan = $1
   `;
-  
+
   const result = await pool.query(query, [orderId]);
   return result.rows[0];
 }
@@ -50,7 +59,7 @@ async function updateOrderStatus(orderId, status) {
     WHERE id_pesanan = $2
     RETURNING *
   `;
-  
+
   const result = await pool.query(query, [status, orderId]);
   return result.rows[0];
 }
@@ -63,7 +72,7 @@ async function getAllOrders() {
     LEFT JOIN users u ON p.user_id = u.id
     ORDER BY p.created_at DESC
   `;
-  
+
   const result = await pool.query(query);
   return result.rows;
 }
@@ -76,7 +85,7 @@ async function cancelOrder(orderId) {
     WHERE id_pesanan = $1
     RETURNING *
   `;
-  
+
   const result = await pool.query(query, [orderId]);
   return result.rows[0];
 }
@@ -87,5 +96,5 @@ module.exports = {
   getOrderById,
   updateOrderStatus,
   getAllOrders,
-  cancelOrder
+  cancelOrder,
 };

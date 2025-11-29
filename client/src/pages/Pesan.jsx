@@ -24,32 +24,32 @@ const Pesan = () => {
 
   // Pricing configuration
   const pricing = {
-    'kelas': {
-      'Python': 250000,
-      'Dasar Pemrograman': 180000
+    kelas: {
+      Python: 100000,
+      "Dasar Pemrograman": 10000,
     },
-    'jasa': {
-      'Jasa Website': 1500000,
-      'Desain': 800000
-    }
+    jasa: {
+      "Jasa Website": 500000,
+      Desain: 20000,
+    },
   };
 
   useEffect(() => {
-    if (tipe === 'kelas') {
+    if (tipe === "kelas") {
       setPaketOptions([
-        { value: 'Python', label: 'Python' },
-        { value: 'Dasar Pemrograman', label: 'Dasar Pemrograman' }
+        { value: "Python", label: "Python" },
+        { value: "Dasar Pemrograman", label: "Dasar Pemrograman" },
       ]);
-      setPaket('Python');
-    } else if (tipe === 'jasa') {
+      setPaket("Python");
+    } else if (tipe === "jasa") {
       setPaketOptions([
-        { value: 'Jasa Website', label: 'Jasa Website' },
-        { value: 'Desain', label: 'Desain' }
+        { value: "Jasa Website", label: "Jasa Website" },
+        { value: "Desain", label: "Desain" },
       ]);
-      setPaket('Jasa Website');
+      setPaket("Jasa Website");
     } else {
       setPaketOptions([]);
-      setPaket('');
+      setPaket("");
     }
   }, [tipe]);
 
@@ -66,11 +66,11 @@ const Pesan = () => {
     setError("");
 
     // Get token from localStorage
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (!token) {
       setError("Anda harus login terlebih dahulu");
       setIsLoading(false);
-      navigate('/login');
+      navigate("/login");
       return;
     }
 
@@ -81,18 +81,18 @@ const Pesan = () => {
         total: harga,
         catatan,
         nama_lengkap: nama,
-        email
+        email,
       };
-      
-      console.log('Sending order data:', orderData);
-      console.log('Token:', token ? 'Present' : 'Missing');
-      
-      const response = await apiPost('/orders', orderData, token);
+
+      console.log("Sending order data:", orderData);
+      console.log("Token:", token ? "Present" : "Missing");
+
+      const response = await apiPost("/orders", orderData, token);
       const orderId = response.data._id; // Pastikan backend mengembalikan ID order
 
       // Navigate to payment page with order data
-      navigate('/payment', { 
-        state: { 
+      navigate("/payment", {
+        state: {
           orderData: {
             _id: orderId,
             tipe_pemesanan: tipe,
@@ -100,13 +100,12 @@ const Pesan = () => {
             total: harga,
             catatan,
             nama_lengkap: nama,
-            email
-          }
-        } 
+            email,
+          },
+        },
       });
-
     } catch (err) {
-      console.error('Order creation error:', err);
+      console.error("Order creation error:", err);
       setError(err.message);
     } finally {
       setIsLoading(false);
@@ -169,7 +168,7 @@ const Pesan = () => {
               disabled={!tipe || isLoading}
             >
               <option value="" disabled>
-                {tipe ? 'Pilih paket' : 'Pilih tipe terlebih dahulu'}
+                {tipe ? "Pilih paket" : "Pilih tipe terlebih dahulu"}
               </option>
               {paketOptions.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -182,7 +181,10 @@ const Pesan = () => {
           {harga > 0 && (
             <div className="bg-blue-900/30 border border-blue-700/50 rounded-lg p-4">
               <p className="text-blue-300 font-medium">
-                Total Harga: <span className="text-xl font-bold text-blue-400">Rp {harga.toLocaleString('id-ID')}</span>
+                Total Harga:{" "}
+                <span className="text-xl font-bold text-blue-400">
+                  Rp {harga.toLocaleString("id-ID")}
+                </span>
               </p>
             </div>
           )}
@@ -234,7 +236,7 @@ const Pesan = () => {
             disabled={isLoading}
             className="w-full bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold py-3 rounded-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:shadow-purple-500/40 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
-            {isLoading ? 'Memproses...' : 'Konfirmasi Pemesanan'}
+            {isLoading ? "Memproses..." : "Konfirmasi Pemesanan"}
           </button>
         </form>
       </section>

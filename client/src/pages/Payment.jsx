@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import { FiArrowLeft, FiCheckCircle } from "react-icons/fi";
+import { FiArrowLeft, FiCheckCircle, FiMessageSquare } from "react-icons/fi";
 
 const Payment = () => {
   const location = useLocation();
@@ -10,8 +10,9 @@ const Payment = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("bank_transfer");
-  
+  const [paymentMethod, setPaymentMethod] = useState("qris");
+  const [paymentCompleted, setPaymentCompleted] = useState(false);
+
   // Get order data from location state
   const orderData = location.state?.orderData || {
     tipe_pemesanan: "",
@@ -53,24 +54,38 @@ const Payment = () => {
     try {
       // Simulate payment processing
       await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // For demo, we'll just show success
-      setSuccess("Pembayaran berhasil diproses!");
-      
-      // Redirect to profile after 2 seconds
-      setTimeout(() => {
-        navigate('/profile', {
-          state: { 
-            success: 'Pembayaran berhasil! Pesanan Anda sedang diproses.'
-          } 
-        });
-      }, 2000);
-      
+
+      // Show payment completion with WhatsApp verification
+      setPaymentCompleted(true);
+      setSuccess("Pembayaran berhasil! Silakan verifikasi melalui WhatsApp.");
+      setIsLoading(false);
+
     } catch (err) {
       console.error('Payment error:', err);
       setError(err.message || 'Terjadi kesalahan saat memproses pembayaran');
       setIsLoading(false);
     }
+  };
+
+  const handleWhatsAppVerification = () => {
+    const phoneNumber = "6282273875270";
+    const message = `Halo, saya ingin verifikasi pembayaran untuk pesanan:\n\n` +
+      `Nama: ${orderData.nama_lengkap}\n` +
+      `Email: ${orderData.email}\n` +
+      `Paket: ${orderData.nama_paket}\n` +
+      `Total: ${formatPrice(orderData.total)}\n\n` +
+      `Mohon konfirmasi status pembayaran saya. Terima kasih!`;
+
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+  };
+
+  const handleFinishVerification = () => {
+    navigate('/profile', {
+      state: { 
+        success: 'Pembayaran berhasil! Pesanan Anda sedang diproses.'
+      } 
+    });
   };
 
   return (
@@ -93,7 +108,7 @@ const Payment = () => {
           <div className="lg:col-span-2">
             <div className="bg-gray-900/60 border border-gray-700/60 rounded-2xl p-6 mb-6">
               <h2 className="text-xl font-semibold mb-4">Ringkasan Pesanan</h2>
-              
+
               <div className="space-y-4">
                 <div className="flex justify-between py-3 border-b border-gray-800">
                   <span className="text-gray-400">Tipe</span>
@@ -101,29 +116,29 @@ const Payment = () => {
                     {orderData.tipe_pemesanan === 'kelas' ? 'Kelas' : 'Jasa'}
                   </span>
                 </div>
-                
+
                 <div className="flex justify-between py-3 border-b border-gray-800">
                   <span className="text-gray-400">Paket</span>
                   <span className="font-medium">{orderData.nama_paket}</span>
                 </div>
-                
+
                 <div className="flex justify-between py-3 border-b border-gray-800">
                   <span className="text-gray-400">Nama</span>
                   <span className="font-medium">{orderData.nama_lengkap}</span>
                 </div>
-                
+
                 <div className="flex justify-between py-3 border-b border-gray-800">
                   <span className="text-gray-400">Email</span>
                   <span className="font-medium">{orderData.email}</span>
                 </div>
-                
+
                 {orderData.catatan && (
                   <div className="py-3 border-b border-gray-800">
                     <p className="text-gray-400 mb-1">Catatan</p>
                     <p className="text-gray-300">{orderData.catatan}</p>
                   </div>
                 )}
-                
+
                 <div className="flex justify-between items-center pt-4">
                   <span className="text-lg font-semibold">Total Pembayaran</span>
                   <span className="text-2xl font-bold text-blue-400">
@@ -136,20 +151,55 @@ const Payment = () => {
             {/* Payment Methods */}
             <div className="bg-gray-900/60 border border-gray-700/60 rounded-2xl p-6">
               <h2 className="text-xl font-semibold mb-4">Metode Pembayaran</h2>
-              
+
               {error && (
                 <div className="bg-red-500/20 border border-red-500 text-red-300 px-4 py-3 rounded-lg mb-6">
                   {error}
                 </div>
               )}
-              
-              {success ? (
+
+              {paymentCompleted ? (
                 <div className="text-center py-8">
                   <div className="inline-flex items-center justify-center w-16 h-16 bg-green-500/20 rounded-full mb-4">
                     <FiCheckCircle className="w-8 h-8 text-green-400" />
                   </div>
                   <h3 className="text-xl font-semibold mb-2">Pembayaran Berhasil!</h3>
-                  <p className="text-gray-400">Mengalihkan ke halaman profil...</p>
+                  <p className="text-gray-400 mb-6">Silakan verifikasi pembayaran Anda melalui WhatsApp untuk konfirmasi.</p>
+
+                  <div className="space-y-4">
+                    <button
+                      onClick={handleWhatsAppVerification}
+                      className="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg font-medium transition-colors"
+                    >
+                      <FiMessageSquare className="w-5 h-5" />
+                      Verifikasi via WhatsApp
+                    </button>
+
+                    <button
+                      onClick={handleFinishVerification}
+                      className="w-full bg-gray-700 hover:bg-gray-600 text-gray-300 py-3 px-6 rounded-lg font-medium transition-colors"
+                    >
+                      Selesai
+                    </button>
+                  </div>
+
+                  <div className="mt-6 p-4 bg-blue-900/20 border border-blue-800/50 rounded-lg text-sm text-blue-200">
+                    <p className="mb-2">📱 <strong>Cara verifikasi:</strong></p>
+                    <ol className="text-left space-y-1 text-blue-300">
+                      <li>1. Klik tombol "Verifikasi via WhatsApp" di atas</li>
+                      <li>2. Kirim pesan dengan detail pembayaran Anda</li>
+                      <li>3. Tunggu konfirmasi dari admin kami</li>
+                      <li>4. Pesanan Anda akan segera diproses</li>
+                    </ol>
+                  </div>
+                </div>
+              ) : success ? (
+                <div className="text-center py-8">
+                  <div className="inline-flex items-center justify-center w-16 h-16 bg-green-500/20 rounded-full mb-4">
+                    <FiCheckCircle className="w-8 h-8 text-green-400" />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2">Memproses Pembayaran...</h3>
+                  <p className="text-gray-400">Mohon tunggu sebentar...</p>
                 </div>
               ) : (
                 <form onSubmit={handlePayment}>
@@ -171,7 +221,7 @@ const Payment = () => {
                           <span className="font-medium">Transfer Bank</span>
                         </div>
                         <p className="text-sm text-gray-400 mt-1">Transfer melalui ATM/Internet Banking/Mobile Banking</p>
-                        
+
                         {paymentMethod === 'bank_transfer' && (
                           <div className="mt-3 p-3 bg-yellow-900/30 border border-yellow-700/50 rounded-lg text-yellow-300 text-sm">
                             <p>Fitur transfer bank akan segera tersedia. Silakan gunakan metode QRIS.</p>
@@ -179,7 +229,7 @@ const Payment = () => {
                         )}
                       </div>
                     </label>
-                    
+
                     {/* Opsi QRIS */}
                     <label className={`flex items-start p-4 border rounded-xl cursor-pointer transition-colors ${
                       paymentMethod === 'qris' ? 'border-blue-500 bg-blue-500/10' : 'border-gray-700 hover:border-gray-600'
@@ -197,22 +247,21 @@ const Payment = () => {
                           <span className="font-medium">QRIS</span>
                         </div>
                         <p className="text-sm text-gray-400 mt-1">Bayar menggunakan QRIS melalui aplikasi e-wallet</p>
-                        
+
                         {paymentMethod === 'qris' && (
                           <div className="mt-4 p-4 bg-white rounded-lg max-w-xs">
                             <img 
-                              src="/qris-placeholder.png" // Ganti dengan path ke gambar QRIS Anda
+                              src="/img/QRIS RYA.jpeg"
                               alt="QRIS Payment" 
                               className="w-full h-auto"
                             />
-                            <p className="text-center text-gray-300 text-sm mt-3">Scan QRIS di atas menggunakan aplikasi e-wallet favorit Anda</p>
-                            <p className="text-center text-gray-400 text-xs mt-2">(Contoh QRIS - ganti dengan kode QRIS yang sebenarnya)</p>
+                            <p className="text-center text-gray-700 text-sm mt-3 font-medium">Scan QRIS di atas menggunakan aplikasi e-wallet favorit Anda</p>
                           </div>
                         )}
                       </div>
                     </label>
                   </div>
-                  
+
                   <button
                     type="submit"
                     disabled={isLoading}

@@ -8,7 +8,7 @@ import UserProfile from "./pages/UserProfile";
 import OrderDetail from "./pages/OrderDetail";
 import Login from "./components/Login";
 import Register from "./components/Register";
-import ApiTest from "./debug/ApiTest";
+import Admin from "./pages/Admin";
 import EnvTest from "./pages/EnvTest";
 import Payment from "./pages/Payment.jsx";
 import "./index.css";
@@ -17,6 +17,15 @@ import "./index.css";
 const ProtectedRoute = ({ children }) => {
   const user = JSON.parse(localStorage.getItem('user'));
   if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+};
+
+// Komponen untuk memproteksi admin route
+const AdminRoute = ({ children }) => {
+  const user = JSON.parse(localStorage.getItem('user'));
+  if (!user || user.email !== 'admin@nexfora.com') {
     return <Navigate to="/login" replace />;
   }
   return children;
@@ -33,8 +42,7 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/payment" element={<Payment />} />
-      <Route path="/debug" element={<ApiTest />} />
-      <Route path="/env-test" element={<EnvTest />} />
+            <Route path="/env-test" element={<EnvTest />} />
       <Route 
         path="/profile" 
         element={
@@ -49,6 +57,14 @@ function App() {
           <ProtectedRoute>
             <OrderDetail />
           </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/admin" 
+        element={
+          <AdminRoute>
+            <Admin />
+          </AdminRoute>
         } 
       />
     </Routes>

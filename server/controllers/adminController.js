@@ -123,5 +123,5 @@ const cancelOrder = async (req, res) => {
 module.exports = {
   getAllOrders,
   verifyOrder,
-  cancelOrder
+  cancelOrder,
 };

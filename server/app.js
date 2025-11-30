@@ -6,10 +6,8 @@ const adminRoutes = require("./routes/adminRoutes");
 
 const app = express();
 
-// CORS configuration - Allow specific origins for production
+// CORS configuration - Railway production only
 const allowedOrigins = [
-  'http://localhost:5173',
-  'http://localhost:3000',
   'https://nexfora.vercel.app',
   'https://nexfora-production.up.railway.app'
 ];
@@ -30,7 +28,7 @@ app.use(
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
-    optionsSuccessStatus: 200 // Some legacy browsers choke on 204
+    optionsSuccessStatus: 200
   })
 );
 

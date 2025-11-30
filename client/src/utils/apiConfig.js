@@ -1,6 +1,6 @@
 // API Configuration untuk development dan production
 const API_BASE_URL = import.meta.env.PROD 
-  ? import.meta.env.VITE_API_URL || window.location.origin 
+  ? import.meta.env.VITE_API_URL || 'https://nexfora-production.up.railway.app' // Railway production URL
   : ''; // Use relative URL for development to go through Vite proxy
 
 export const API_CONFIG = {
@@ -23,13 +23,11 @@ export const API_CONFIG = {
 
 // Helper untuk membuat API calls
 export const createApiCall = async (url, options = {}) => {
-  const isDevelopment = !import.meta.env.PROD;
-  
   const config = {
     headers: {
       'Content-Type': 'application/json',
-      // Only add token in production or when not bypassing auth
-      ...(!isDevelopment && {
+      // Always send token if available
+      ...(localStorage.getItem('token') && {
         'Authorization': `Bearer ${localStorage.getItem('token')}`
       }),
       ...options.headers

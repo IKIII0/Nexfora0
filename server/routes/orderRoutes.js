@@ -1,35 +1,23 @@
 const express = require("express");
+const { authenticateToken } = require("../middleware/authMiddleware");
 const {
   createNewOrder,
   getUserOrders,
-  getOrder,
-  updateStatus,
-  getAllOrdersController,
-  cancelOrderController,
-  authenticateToken
+  getOrder
 } = require("../controllers/orderController");
 
 const router = express.Router();
 
-// Apply authentication middleware to all routes
+// Apply authentication middleware to all user order routes
 router.use(authenticateToken);
 
-// POST /api/orders - Create new order
+// POST /api/orders - Create new order (user)
 router.post("/", createNewOrder);
 
-// GET /api/orders - Get current user's orders
+// GET /api/orders - Get current user's orders (user)
 router.get("/", getUserOrders);
 
-// GET /api/orders/all - Get all orders (admin only)
-router.get("/all", getAllOrdersController);
-
-// GET /api/orders/:id - Get specific order by ID
+// GET /api/orders/:id - Get specific order by ID (user)
 router.get("/:id", getOrder);
-
-// PUT /api/orders/:id/status - Update order status (admin only)
-router.put("/:id/status", updateStatus);
-
-// PUT /api/orders/:id/cancel - Cancel order
-router.put("/:id/cancel", cancelOrderController);
 
 module.exports = router;

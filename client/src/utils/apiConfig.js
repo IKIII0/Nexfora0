@@ -10,11 +10,11 @@ export const API_CONFIG = {
     login: `${API_BASE_URL}/api/auth/login`,
     register: `${API_BASE_URL}/api/auth/register`,
     
-    // Orders
+    // User Orders
     createOrder: `${API_BASE_URL}/api/orders`,
-    getUserOrders: `${API_BASE_URL}/api/orders/user`,
+    getUserOrders: `${API_BASE_URL}/api/orders`,
     
-    // Admin
+    // Admin Orders
     adminOrders: `${API_BASE_URL}/api/admin/orders`,
     verifyOrder: (orderId) => `${API_BASE_URL}/api/admin/orders/${orderId}/verify`,
     cancelOrder: (orderId) => `${API_BASE_URL}/api/admin/orders/${orderId}/cancel`,

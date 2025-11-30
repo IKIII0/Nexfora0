@@ -9,8 +9,26 @@ const Jasa = () => {
   const jasa = [
     {
       title: "Jasa Pembuatan Website",
-      description:
-        "Bangun website profesional untuk bisnis atau portofolio Anda dengan teknologi terbaru.",
+      description: (
+        <ul className="text-left space-y-2">
+          <li className="flex items-start gap-2">
+            <span className="text-blue-400 font-bold mt-0.5">•</span>
+            <span>Teknologi terbaru dan responsif di semua perangkat</span>
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="text-blue-400 font-bold mt-0.5">•</span>
+            <span>Fungsionalitas lengkap sesuai kebutuhan bisnis Anda</span>
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="text-blue-400 font-bold mt-0.5">•</span>
+            <span>Free maintenance dan support berkelanjutan</span>
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="text-blue-400 font-bold mt-0.5">•</span>
+            <span>Disesuaikan dengan kebutuhan unik Anda</span>
+          </li>
+        </ul>
+      ),
       price: <span className="text-blue-400 font-semibold">Mulai dari Rp 500.000</span>,
       icon: <FaCode className="text-green-400" size={32} />,
     },
@@ -146,6 +164,5 @@ const Jasa = () => {
     </div>
   );
 };
-
 
 export default Jasa;

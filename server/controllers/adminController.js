@@ -5,11 +5,19 @@ const getAllOrders = async (req, res) => {
   try {
     // Check if user is admin
     if (!req.user) {
-      return res.status(401).json({ error: 'Authentication required' });
+      return res.status(401).json({
+        status: "error",
+        code: 401,
+        message: 'Authentication required'
+      });
     }
     
     if (req.user.email !== 'admin@nexfora.com') {
-      return res.status(403).json({ error: 'Access denied. Admin only.' });
+      return res.status(403).json({
+        status: "error",
+        code: 403,
+        message: 'Access denied. Admin only.'
+      });
     }
 
     const query = `
@@ -21,12 +29,18 @@ const getAllOrders = async (req, res) => {
     const result = await pool.query(query);
     
     res.status(200).json({
-      success: true,
+      status: "success",
+      code: 200,
+      message: "Orders retrieved successfully",
       orders: result.rows
     });
   } catch (error) {
     console.error('Error fetching orders:', error);
-    res.status(500).json({ error: 'Failed to fetch orders' });
+    res.status(500).json({
+      status: "error",
+      code: 500,
+      message: "Failed to fetch orders"
+    });
   }
 };
 
@@ -35,11 +49,19 @@ const verifyOrder = async (req, res) => {
   try {
     // Check if user is admin
     if (!req.user) {
-      return res.status(401).json({ error: 'Authentication required' });
+      return res.status(401).json({
+        status: "error",
+        code: 401,
+        message: 'Authentication required'
+      });
     }
     
     if (req.user.email !== 'admin@nexfora.com') {
-      return res.status(403).json({ error: 'Access denied. Admin only.' });
+      return res.status(403).json({
+        status: "error",
+        code: 403,
+        message: 'Access denied. Admin only.'
+      });
     }
 
     const { orderId } = req.params;
@@ -71,13 +93,18 @@ const verifyOrder = async (req, res) => {
     const result = await pool.query(updateQuery, [orderId]);
     
     res.status(200).json({
-      success: true,
+      status: "success",
+      code: 200,
       message: 'Order verified successfully',
       order: result.rows[0]
     });
   } catch (error) {
     console.error('Error verifying order:', error);
-    res.status(500).json({ error: 'Failed to verify order' });
+    res.status(500).json({
+      status: "error",
+      code: 500,
+      message: 'Failed to verify order'
+    });
   }
 };
 
@@ -86,11 +113,19 @@ const cancelOrder = async (req, res) => {
   try {
     // Check if user is admin
     if (!req.user) {
-      return res.status(401).json({ error: 'Authentication required' });
+      return res.status(401).json({
+        status: "error",
+        code: 401,
+        message: 'Authentication required'
+      });
     }
     
     if (req.user.email !== 'admin@nexfora.com') {
-      return res.status(403).json({ error: 'Access denied. Admin only.' });
+      return res.status(403).json({
+        status: "error",
+        code: 403,
+        message: 'Access denied. Admin only.'
+      });
     }
 
     const { orderId } = req.params;
@@ -122,13 +157,18 @@ const cancelOrder = async (req, res) => {
     const result = await pool.query(updateQuery, [orderId]);
     
     res.status(200).json({
-      success: true,
+      status: "success",
+      code: 200,
       message: 'Order cancelled successfully',
       order: result.rows[0]
     });
   } catch (error) {
     console.error('Error cancelling order:', error);
-    res.status(500).json({ error: 'Failed to cancel order' });
+    res.status(500).json({
+      status: "error",
+      code: 500,
+      message: 'Failed to cancel order'
+    });
   }
 };
 

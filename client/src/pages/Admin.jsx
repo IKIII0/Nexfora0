@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiUsers, FiShoppingBag, FiCheckCircle, FiClock, FiXCircle, FiLogOut, FiRefreshCw, FiFilter } from "react-icons/fi";
+import { API_CONFIG, createApiCall } from "../utils/apiConfig";
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -23,37 +24,20 @@ const Admin = () => {
   const fetchOrders = async () => {
     try {
       const token = localStorage.getItem('token');
+      const user = localStorage.getItem('user');
+      
+      console.log('=== Frontend Debug ===');
+      console.log('Token exists:', !!token);
+      console.log('Token length:', token?.length || 0);
+      console.log('Token:', token?.slice(0, 50) + '...');
+      console.log('User:', user);
+      
       if (!token) {
         throw new Error('Token tidak ditemukan');
       }
 
       console.log('Fetching admin orders...');
-      const response = await fetch('/api/admin/orders', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      console.log('Response status:', response.status);
-      console.log('Response headers:', response.headers);
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Response error:', errorText);
-        throw new Error(`HTTP ${response.status}: ${errorText}`);
-      }
-
-      const contentType = response.headers.get('content-type');
-      console.log('Content-Type:', contentType);
-      
-      if (!contentType || !contentType.includes('application/json')) {
-        const errorText = await response.text();
-        console.error('Non-JSON response:', errorText);
-        throw new Error('Server mengembalikan response yang tidak valid');
-      }
-
-      const data = await response.json();
+      const data = await createApiCall(API_CONFIG.endpoints.adminOrders);
       console.log('Received data:', data);
       setOrders(data.orders || []);
     } catch (err) {
@@ -66,25 +50,9 @@ const Admin = () => {
 
   const handleVerifyOrder = async (orderId) => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`/api/admin/orders/${orderId}/verify`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+      await createApiCall(API_CONFIG.endpoints.verifyOrder(orderId), {
+        method: 'PUT'
       });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Verify error:', errorText);
-        throw new Error('Gagal memverifikasi pesanan');
-      }
-
-      const contentType = response.headers.get('content-type');
-      if (contentType && contentType.includes('application/json')) {
-        await response.json();
-      }
       
       // Refresh orders
       setRefreshKey(prev => prev + 1);
@@ -101,25 +69,9 @@ const Admin = () => {
     }
 
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`/api/admin/orders/${orderId}/cancel`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+      await createApiCall(API_CONFIG.endpoints.cancelOrder(orderId), {
+        method: 'PUT'
       });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Cancel error:', errorText);
-        throw new Error('Gagal membatalkan pesanan');
-      }
-
-      const contentType = response.headers.get('content-type');
-      if (contentType && contentType.includes('application/json')) {
-        await response.json();
-      }
       
       // Refresh orders
       setRefreshKey(prev => prev + 1);

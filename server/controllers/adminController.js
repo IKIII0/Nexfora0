@@ -3,6 +3,11 @@ const pool = require('../db');
 // Get all orders for admin
 const getAllOrders = async (req, res) => {
   try {
+    console.log('=== Admin Controller Debug ===');
+    console.log('req.user:', req.user);
+    console.log('req.user.email:', req.user?.email);
+    console.log('req.user.role:', req.user?.role);
+    
     // Check if user is admin
     if (!req.user) {
       return res.status(401).json({
@@ -13,12 +18,15 @@ const getAllOrders = async (req, res) => {
     }
     
     if (req.user.email !== 'admin@nexfora.com') {
+      console.log('Access denied for email:', req.user.email);
       return res.status(403).json({
         status: "error",
         code: 403,
         message: 'Access denied. Admin only.'
       });
     }
+
+    console.log('Admin access granted for:', req.user.email);
 
     const query = `
       SELECT id_pesanan, nama_lengkap, email, tipe_pemesanan, nama_paket, total, catatan, status, created_at, updated_at

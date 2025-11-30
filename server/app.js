@@ -6,14 +6,11 @@ const adminRoutes = require("./routes/adminRoutes");
 
 const app = express();
 
-// CORS configuration
-const isDevelopment = process.env.NODE_ENV !== 'production';
-const allowedOrigins = isDevelopment ? [
-  'http://localhost:5173',
-  'http://localhost:3000'
-] : [
+// CORS configuration - Railway + localhost development
+const allowedOrigins = [
   'https://nexfora.vercel.app',
-  'https://nexfora0-production.up.railway.app'
+  'https://nexfora0-production.up.railway.app',
+  'http://localhost:5173'  // Development
 ];
 
 app.use(cors({

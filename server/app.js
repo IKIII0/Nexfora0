@@ -33,7 +33,6 @@ app.use(
 );
 
 app.use(express.json());
-app.options("*", cors());
 
 // Enhanced JSON parsing with debugging
 app.use((req, res, next) => {

@@ -1,16 +1,28 @@
 const express = require("express");
-const { corsMiddleware } = require("./cors-config");
+const cors = require("cors");
 const authRoutes = require("./routes/authRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 
 const app = express();
 
-// Apply CORS middleware
-app.use(corsMiddleware);
+// CORS configuration
+const isDevelopment = process.env.NODE_ENV !== 'production';
+const allowedOrigins = isDevelopment ? [
+  'http://localhost:5173',
+  'http://localhost:3000'
+] : [
+  'https://nexfora.vercel.app',
+  'https://nexfora0-production.up.railway.app'
+];
 
-// Handle preflight requests
-app.options('*', corsMiddleware);
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  optionsSuccessStatus: 200
+}));
 
 app.use(express.json());
 app.use((req, res, next) => {

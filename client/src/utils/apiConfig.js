@@ -1,7 +1,7 @@
-// API Configuration untuk Railway production
-const API_BASE_URL = import.meta.env.PROD 
-  ? 'https://nexfora0-production.up.railway.app' // Fixed Railway URL
-  : ''; // Use relative URL for development to go through Vite proxy
+// API Configuration - Development proxy + Railway production
+const API_BASE_URL = import.meta.env.DEV 
+  ? ''  // Use relative URL for development proxy
+  : 'https://nexfora0-production.up.railway.app'; // Production
 
 export const API_CONFIG = {
   baseURL: API_BASE_URL,
@@ -23,17 +23,26 @@ export const API_CONFIG = {
 
 // Helper untuk membuat API calls
 export const createApiCall = async (url, options = {}) => {
+  const token = localStorage.getItem('token');
+  console.log('=== API Call Debug ===');
+  console.log('URL:', url);
+  console.log('Token exists:', !!token);
+  console.log('Token length:', token?.length || 0);
+  console.log('Token:', token?.slice(0, 30) + '...');
+  
   const config = {
     headers: {
       'Content-Type': 'application/json',
       // Always send token if available
-      ...(localStorage.getItem('token') && {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      ...(token && {
+        'Authorization': `Bearer ${token}`
       }),
       ...options.headers
     },
     ...options
   };
+
+  console.log('Request headers:', config.headers);
 
   try {
     const response = await fetch(url, config);

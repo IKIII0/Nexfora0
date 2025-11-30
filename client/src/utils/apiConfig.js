@@ -1,6 +1,6 @@
 // API Configuration untuk Railway production
 const API_BASE_URL = import.meta.env.PROD 
-  ? 'https://nexfora-production.up.railway.app' // Fixed Railway URL
+  ? 'https://nexfora0-production.up.railway.app' // Fixed Railway URL
   : ''; // Use relative URL for development to go through Vite proxy
 
 export const API_CONFIG = {

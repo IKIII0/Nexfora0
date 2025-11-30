@@ -1,40 +1,18 @@
 const express = require("express");
-const cors = require("cors");
+const { corsMiddleware } = require("./cors-config");
 const authRoutes = require("./routes/authRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 
 const app = express();
 
-// CORS configuration - Railway production only
-const allowedOrigins = [
-  'https://nexfora.vercel.app',
-  'https://nexfora-production.up.railway.app'
-];
+// Apply CORS middleware
+app.use(corsMiddleware);
 
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      // Allow requests with no origin (like mobile apps or curl requests)
-      if (!origin) return callback(null, true);
-      
-      if (allowedOrigins.indexOf(origin) !== -1) {
-        callback(null, true);
-      } else {
-        console.log('CORS blocked origin:', origin);
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    optionsSuccessStatus: 200
-  })
-);
+// Handle preflight requests
+app.options('*', corsMiddleware);
 
 app.use(express.json());
-
-// Enhanced JSON parsing with debugging
 app.use((req, res, next) => {
   if (req.method === "POST" || req.method === "PUT") {
     console.log("=== POST/PUT Request Debug ===");

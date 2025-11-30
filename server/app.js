@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const authRoutes = require("./routes/authRoutes");
 const orderRoutes = require("./routes/orderRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 
 const app = express();
 
@@ -51,6 +52,7 @@ app.use((req, res, next) => {
 // Routes must come before error handlers
 app.use("/api/auth", authRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/admin", adminRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

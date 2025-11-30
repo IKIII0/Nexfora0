@@ -32,6 +32,13 @@ function Login() {
 
       // Redirect berdasarkan role atau halaman sebelumnya
       const redirectState = location.state;
+      
+      // Jika admin, redirect ke admin page
+      if (email === 'admin@nexfora.com') {
+        navigate('/admin');
+        return;
+      }
+      
       if (redirectState?.from === "/pesan") {
         navigate("/pesan", {
           state: redirectState.booking

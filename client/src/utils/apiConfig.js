@@ -10,14 +10,39 @@ export const API_CONFIG = {
     login: `${API_BASE_URL}/api/auth/login`,
     register: `${API_BASE_URL}/api/auth/register`,
     
+    // Products
+    getProducts: `${API_BASE_URL}/api/products`,
+    getProductById: (id) => `${API_BASE_URL}/api/products/${id}`,
+    
+    // Categories
+    getCategories: `${API_BASE_URL}/api/categories`,
+    getCategoriesWithCount: `${API_BASE_URL}/api/categories/with-count`,
+    
     // User Orders
-    createOrder: `${API_BASE_URL}/api/orders`,
+    checkout: `${API_BASE_URL}/api/orders/checkout`,
     getUserOrders: `${API_BASE_URL}/api/orders`,
+    getOrderById: (id) => `${API_BASE_URL}/api/orders/${id}`,
+    getOrderStats: `${API_BASE_URL}/api/orders/stats`,
+    uploadPayment: (id) => `${API_BASE_URL}/api/orders/${id}/payment`,
+    cancelUserOrder: (id) => `${API_BASE_URL}/api/orders/${id}/cancel`,
+    
+    // Reviews
+    getProductReviews: (productId) => `${API_BASE_URL}/api/reviews/product/${productId}`,
+    getUserReviews: `${API_BASE_URL}/api/reviews/user`,
+    createReview: `${API_BASE_URL}/api/reviews`,
+    updateReview: (id) => `${API_BASE_URL}/api/reviews/${id}`,
+    deleteReview: (id) => `${API_BASE_URL}/api/reviews/${id}`,
+    
+    // Dashboard
+    getUserDashboard: `${API_BASE_URL}/api/dashboard`,
     
     // Admin Orders
+    adminDashboard: `${API_BASE_URL}/api/admin/dashboard`,
     adminOrders: `${API_BASE_URL}/api/admin/orders`,
     verifyOrder: (orderId) => `${API_BASE_URL}/api/admin/orders/${orderId}/verify`,
     cancelOrder: (orderId) => `${API_BASE_URL}/api/admin/orders/${orderId}/cancel`,
+    salesReport: `${API_BASE_URL}/api/admin/sales-report`,
+    revenueReport: `${API_BASE_URL}/api/admin/revenue`,
   }
 };
 

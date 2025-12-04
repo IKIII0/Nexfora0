@@ -1,78 +1,119 @@
 const pool = require("../db");
 
-// Create new order
-async function createOrder(userId, orderData) {
-  const { tipe_pemesanan, nama_paket, total, catatan, nama_lengkap, email } = orderData;
-  
+// Process checkout using stored procedure
+async function processCheckout(checkoutData) {
+  const {
+    user_id,
+    product_ids,
+    quantities,
+    nama_lengkap,
+    email,
+    phone,
+    payment_method,
+    catatan
+  } = checkoutData;
+
   const query = `
-    INSERT INTO pemesanan (user_id, tipe_pemesanan, nama_paket, total, catatan, nama_lengkap, email)
-    VALUES ($1, $2, $3, $4, $5, $6, $7)
-    RETURNING *
+    CALL process_checkout($1, $2, $3, $4, $5, $6, $7, $8, NULL, NULL)
   `;
-  
-  const values = [userId, tipe_pemesanan, nama_paket, total, catatan, nama_lengkap, email];
+
+  const values = [
+    user_id,
+    product_ids,
+    quantities,
+    nama_lengkap,
+    email,
+    phone,
+    payment_method,
+    catatan || null
+  ];
+
   const result = await pool.query(query, values);
-  return result.rows[0];
+  
+  // Get the created order
+  const orderQuery = `
+    SELECT * FROM pemesanan 
+    WHERE user_id = $1 
+    ORDER BY created_at DESC 
+    LIMIT 1
+  `;
+  const orderResult = await pool.query(orderQuery, [user_id]);
+  return orderResult.rows[0];
 }
 
 // Get all orders for a specific user
 async function getOrdersByUserId(userId) {
   const query = `
-    SELECT id_pesanan, tipe_pemesanan, nama_paket, total, status, 
-           DATE(tanggal) as tanggal, catatan, nama_lengkap, email, created_at
-    FROM pemesanan 
+    SELECT * FROM v_order_summary
     WHERE user_id = $1 
-    ORDER BY created_at DESC
+    ORDER BY tanggal DESC
   `;
   
   const result = await pool.query(query, [userId]);
   return result.rows;
 }
 
-// Get order by ID
+// Get order by ID with items
 async function getOrderById(orderId) {
-  const query = `
-    SELECT id_pesanan, user_id, tipe_pemesanan, nama_paket, total, status, 
-           DATE(tanggal) as tanggal, catatan, nama_lengkap, email, created_at, updated_at
-    FROM pemesanan 
+  const orderQuery = `
+    SELECT * FROM v_order_summary
     WHERE id_pesanan = $1
   `;
   
-  const result = await pool.query(query, [orderId]);
-  return result.rows[0];
+  const itemsQuery = `
+    SELECT * FROM order_items
+    WHERE order_id = $1
+  `;
+  
+  const orderResult = await pool.query(orderQuery, [orderId]);
+  const itemsResult = await pool.query(itemsQuery, [orderId]);
+  
+  if (orderResult.rows.length === 0) {
+    return null;
+  }
+  
+  return {
+    ...orderResult.rows[0],
+    items: itemsResult.rows
+  };
 }
 
 // Update order status
-async function updateOrderStatus(orderId, status) {
-  const query = `
+async function updateOrderStatus(orderId, status, paymentProof = null) {
+  let query = `
     UPDATE pemesanan 
-    SET status = $1, updated_at = CURRENT_TIMESTAMP
-    WHERE id_pesanan = $2
-    RETURNING *
+    SET status = $1
   `;
   
-  const result = await pool.query(query, [status, orderId]);
+  const values = [status, orderId];
+  
+  if (paymentProof) {
+    query += `, payment_proof = $3`;
+    values.splice(2, 0, paymentProof);
+  }
+  
+  query += ` WHERE id_pesanan = $2 RETURNING *`;
+  
+  const result = await pool.query(query, values);
   return result.rows[0];
 }
 
-// Get all orders (for admin)
+// Get all orders (for admin) using view
 async function getAllOrders() {
   const query = `
-    SELECT p.*, u.nama_lengkap as user_name, u.email as user_email
-    FROM pemesanan p
-    LEFT JOIN users u ON p.user_id = u.id
-    ORDER BY p.created_at DESC
+    SELECT * FROM v_order_summary
+    ORDER BY tanggal DESC
   `;
   
   const result = await pool.query(query);
   return result.rows;
 }
 
-// Delete order (soft delete by changing status to cancelled)
+// Cancel order
 async function cancelOrder(orderId) {
   const query = `
     UPDATE pemesanan 
-    SET status = 'Dibatalkan', updated_at = CURRENT_TIMESTAMP
+    SET status = 'Dibatalkan'
     WHERE id_pesanan = $1
     RETURNING *
   `;
@@ -81,11 +122,19 @@ async function cancelOrder(orderId) {
   return result.rows[0];
 }
 
+// Get user order statistics
+async function getUserOrderStats(userId) {
+  const query = `SELECT * FROM get_user_order_stats($1)`;
+  const result = await pool.query(query, [userId]);
+  return result.rows[0];
+}
+
 module.exports = {
-  createOrder,
+  processCheckout,
   getOrdersByUserId,
   getOrderById,
   updateOrderStatus,
   getAllOrders,
-  cancelOrder
+  cancelOrder,
+  getUserOrderStats
 };

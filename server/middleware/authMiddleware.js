@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 
+// Authenticate token middleware
 const authenticateToken = (req, res, next) => {
   if (req.method === 'OPTIONS') {
     return next();
@@ -8,31 +9,50 @@ const authenticateToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
 
-  console.log('=== Auth Middleware Debug ===');
-  console.log('Auth header:', authHeader);
-  console.log('Token exists:', !!token);
-  console.log('Token length:', token?.length || 0);
-  console.log('JWT_SECRET exists:', !!process.env.JWT_SECRET);
-  console.log('JWT_SECRET length:', process.env.JWT_SECRET?.length || 0);
-
   if (!token) {
-    console.log('No token provided');
-    return res.status(401).json({ error: 'Access token required' });
+    return res.status(401).json({
+      status: "error",
+      code: 401,
+      message: 'Token akses diperlukan'
+    });
   }
 
   jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
     if (err) {
-      console.log('JWT verification failed:', err.message);
-      return res.status(403).json({ error: 'Invalid or expired token' });
+      return res.status(403).json({
+        status: "error",
+        code: 403,
+        message: 'Token tidak valid atau sudah kadaluarsa'
+      });
     }
     
-    console.log('JWT verification successful');
-    console.log('Decoded user:', user);
     req.user = user;
     next();
   });
 };
 
+// Check if user is admin
+const isAdmin = (req, res, next) => {
+  if (!req.user) {
+    return res.status(401).json({
+      status: "error",
+      code: 401,
+      message: 'Autentikasi diperlukan'
+    });
+  }
+  
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({
+      status: "error",
+      code: 403,
+      message: 'Akses ditolak. Hanya admin yang diizinkan.'
+    });
+  }
+  
+  next();
+};
+
 module.exports = {
-  authenticateToken
+  authenticateToken,
+  isAdmin
 };

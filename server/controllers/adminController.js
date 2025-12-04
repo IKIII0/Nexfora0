@@ -1,187 +1,159 @@
-const pool = require('../db');
+const { getAllOrders, updateOrderStatus } = require("../services/orderService");
+const { getProductSalesReport } = require("../services/productService");
+const { getAdminDashboard, getRevenueReport } = require("../services/dashboardService");
 
-// Get all orders for admin
-const getAllOrders = async (req, res) => {
+// Get admin dashboard
+async function getDashboard(req, res) {
   try {
-    console.log('=== Admin Controller Debug ===');
-    console.log('req.user:', req.user);
-    console.log('req.user.email:', req.user?.email);
-    console.log('req.user.role:', req.user?.role);
-    
-    // Check if user is admin
-    if (!req.user) {
-      return res.status(401).json({
-        status: "error",
-        code: 401,
-        message: 'Authentication required'
-      });
-    }
-    
-    if (req.user.email !== 'admin@nexfora.com') {
-      console.log('Access denied for email:', req.user.email);
-      return res.status(403).json({
-        status: "error",
-        code: 403,
-        message: 'Access denied. Admin only.'
-      });
-    }
-
-    console.log('Admin access granted for:', req.user.email);
-
-    const query = `
-      SELECT id_pesanan, nama_lengkap, email, tipe_pemesanan, nama_paket, total, catatan, status, created_at, updated_at
-      FROM pemesanan 
-      ORDER BY created_at DESC
-    `;
-    
-    const result = await pool.query(query);
+    const dashboard = await getAdminDashboard();
     
     res.status(200).json({
       status: "success",
       code: 200,
-      message: "Orders retrieved successfully",
-      orders: result.rows
+      message: "Dashboard berhasil diambil",
+      data: dashboard
+    });
+  } catch (error) {
+    console.error('Error fetching dashboard:', error);
+    res.status(500).json({
+      status: "error",
+      code: 500,
+      message: "Gagal mengambil dashboard"
+    });
+  }
+}
+
+// Get all orders for admin
+async function getOrders(req, res) {
+  try {
+    const orders = await getAllOrders();
+    
+    res.status(200).json({
+      status: "success",
+      code: 200,
+      message: "Pesanan berhasil diambil",
+      data: orders
     });
   } catch (error) {
     console.error('Error fetching orders:', error);
     res.status(500).json({
       status: "error",
       code: 500,
-      message: "Failed to fetch orders"
+      message: "Gagal mengambil pesanan"
     });
   }
-};
+}
 
 // Verify order (mark as completed)
-const verifyOrder = async (req, res) => {
+async function verifyOrder(req, res) {
   try {
-    // Check if user is admin
-    if (!req.user) {
-      return res.status(401).json({
-        status: "error",
-        code: 401,
-        message: 'Authentication required'
-      });
-    }
-    
-    if (req.user.email !== 'admin@nexfora.com') {
-      return res.status(403).json({
-        status: "error",
-        code: 403,
-        message: 'Access denied. Admin only.'
-      });
-    }
-
     const { orderId } = req.params;
     
-    // Check if order exists
-    const orderCheck = await pool.query(
-      'SELECT id_pesanan, status FROM pemesanan WHERE id_pesanan = $1',
-      [orderId]
-    );
+    const order = await updateOrderStatus(orderId, 'Selesai');
     
-    if (orderCheck.rows.length === 0) {
-      return res.status(404).json({ error: 'Order not found' });
+    if (!order) {
+      return res.status(404).json({
+        status: "error",
+        code: 404,
+        message: "Pesanan tidak ditemukan"
+      });
     }
-    
-    const order = orderCheck.rows[0];
-    
-    if (order.status !== 'Dalam Proses') {
-      return res.status(400).json({ error: 'Order can only be verified if status is pending' });
-    }
-
-    // Update order status to completed
-    const updateQuery = `
-      UPDATE pemesanan 
-      SET status = 'Selesai', updated_at = CURRENT_TIMESTAMP 
-      WHERE id_pesanan = $1 
-      RETURNING *
-    `;
-    
-    const result = await pool.query(updateQuery, [orderId]);
     
     res.status(200).json({
       status: "success",
       code: 200,
-      message: 'Order verified successfully',
-      order: result.rows[0]
+      message: "Pesanan berhasil diverifikasi",
+      data: order
     });
   } catch (error) {
     console.error('Error verifying order:', error);
     res.status(500).json({
       status: "error",
       code: 500,
-      message: 'Failed to verify order'
+      message: "Gagal memverifikasi pesanan"
     });
   }
-};
+}
 
 // Cancel order
-const cancelOrder = async (req, res) => {
+async function cancelOrder(req, res) {
   try {
-    // Check if user is admin
-    if (!req.user) {
-      return res.status(401).json({
-        status: "error",
-        code: 401,
-        message: 'Authentication required'
-      });
-    }
-    
-    if (req.user.email !== 'admin@nexfora.com') {
-      return res.status(403).json({
-        status: "error",
-        code: 403,
-        message: 'Access denied. Admin only.'
-      });
-    }
-
     const { orderId } = req.params;
     
-    // Check if order exists
-    const orderCheck = await pool.query(
-      'SELECT id_pesanan, status FROM pemesanan WHERE id_pesanan = $1',
-      [orderId]
-    );
+    const order = await updateOrderStatus(orderId, 'Dibatalkan');
     
-    if (orderCheck.rows.length === 0) {
-      return res.status(404).json({ error: 'Order not found' });
+    if (!order) {
+      return res.status(404).json({
+        status: "error",
+        code: 404,
+        message: "Pesanan tidak ditemukan"
+      });
     }
-    
-    const order = orderCheck.rows[0];
-    
-    if (order.status !== 'Dalam Proses') {
-      return res.status(400).json({ error: 'Order can only be cancelled if status is pending' });
-    }
-
-    // Update order status to cancelled
-    const updateQuery = `
-      UPDATE pemesanan 
-      SET status = 'Dibatalkan', updated_at = CURRENT_TIMESTAMP 
-      WHERE id_pesanan = $1 
-      RETURNING *
-    `;
-    
-    const result = await pool.query(updateQuery, [orderId]);
     
     res.status(200).json({
       status: "success",
       code: 200,
-      message: 'Order cancelled successfully',
-      order: result.rows[0]
+      message: "Pesanan berhasil dibatalkan",
+      data: order
     });
   } catch (error) {
     console.error('Error cancelling order:', error);
     res.status(500).json({
       status: "error",
       code: 500,
-      message: 'Failed to cancel order'
+      message: "Gagal membatalkan pesanan"
     });
   }
-};
+}
+
+// Get product sales report
+async function getSalesReport(req, res) {
+  try {
+    const report = await getProductSalesReport();
+    
+    res.status(200).json({
+      status: "success",
+      code: 200,
+      message: "Laporan penjualan berhasil diambil",
+      data: report
+    });
+  } catch (error) {
+    console.error('Error fetching sales report:', error);
+    res.status(500).json({
+      status: "error",
+      code: 500,
+      message: "Gagal mengambil laporan penjualan"
+    });
+  }
+}
+
+// Get revenue report
+async function getRevenue(req, res) {
+  try {
+    const { start_date, end_date } = req.query;
+    const report = await getRevenueReport(start_date, end_date);
+    
+    res.status(200).json({
+      status: "success",
+      code: 200,
+      message: "Laporan revenue berhasil diambil",
+      data: report
+    });
+  } catch (error) {
+    console.error('Error fetching revenue report:', error);
+    res.status(500).json({
+      status: "error",
+      code: 500,
+      message: "Gagal mengambil laporan revenue"
+    });
+  }
+}
 
 module.exports = {
-  getAllOrders,
+  getDashboard,
+  getOrders,
   verifyOrder,
   cancelOrder,
+  getSalesReport,
+  getRevenue
 };

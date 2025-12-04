@@ -75,38 +75,58 @@ const Pesan = () => {
     }
 
     try {
-      const orderData = {
-        tipe_pemesanan: tipe,
-        nama_paket: paket,
-        total: harga,
-        catatan,
-        nama_lengkap: nama,
-        email,
+      // Format data sesuai backend baru (checkout dengan product_ids)
+      // Untuk sementara, kita perlu product_id yang sesuai
+      // Ini adalah temporary solution - idealnya pilih dari list products
+      const productIdMap = {
+        'Python': 2, // React JS Masterclass (contoh)
+        'Dasar Pemrograman': 1, // Full Stack Web Development (contoh)
+        'Jasa Website': 5, // Company Profile Website (contoh)
+        'Desain': 8, // Logo & Branding Package (contoh)
       };
 
-      console.log("Sending order data:", orderData);
+      const productId = productIdMap[paket] || 1;
+
+      const checkoutData = {
+        product_ids: [productId],
+        quantities: [1],
+        nama_lengkap: nama,
+        email: email,
+        phone: '', // Tambahkan field phone jika ada
+        payment_method: 'Transfer Bank',
+        catatan: catatan || ''
+      };
+
+      console.log("Sending checkout data:", checkoutData);
       console.log("Token:", token ? "Present" : "Missing");
 
-      const response = await apiPost("/orders", orderData, token);
-      const orderId = response.data._id; // Pastikan backend mengembalikan ID order
-
-      // Navigate to payment page with order data
-      navigate("/payment", {
-        state: {
-          orderData: {
-            _id: orderId,
-            tipe_pemesanan: tipe,
-            nama_paket: paket,
-            total: harga,
-            catatan,
-            nama_lengkap: nama,
-            email,
+      const response = await apiPost("/orders/checkout", checkoutData, token);
+      
+      if (response.status === "success") {
+        const order = response.data;
+        
+        // Navigate to payment page with order data
+        navigate("/payment", {
+          state: {
+            orderData: {
+              id_pesanan: order.id_pesanan,
+              kode_pesanan: order.kode_pesanan,
+              nama_paket: paket,
+              tipe_pemesanan: tipe,
+              total: order.total,
+              catatan: catatan,
+              nama_lengkap: nama,
+              email: email,
+              status: order.status
+            },
           },
-        },
-      });
+        });
+      } else {
+        throw new Error(response.message || "Checkout gagal");
+      }
     } catch (err) {
       console.error("Order creation error:", err);
-      setError(err.message);
+      setError(err.message || "Terjadi kesalahan saat membuat pesanan");
     } finally {
       setIsLoading(false);
     }

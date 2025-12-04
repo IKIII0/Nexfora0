@@ -1,29 +1,40 @@
-// API Helper Functions
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-/**
- * Generic API fetch function with error handling
- * @param {string} url - API endpoint URL
- * @param {Object} options - Fetch options (method, headers, body)
- * @returns {Promise<Object>} - JSON response data
- */
-export const apiFetch = async (url, options = {}) => {
+export const apiPost = async (endpoint, data, token) => {
+  console.log('API POST Request:', { endpoint, data, hasToken: !!token });
+  
   try {
-    const response = await fetch(url, {
-      ...options,
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        ...options.headers
-      }
+        ...(token && { 'Authorization': `Bearer ${token}` })
+      },
+      body: JSON.stringify(data)
     });
 
-    // Check if response is JSON
-    const contentType = response.headers.get('content-type');
-    if (!contentType || !contentType.includes('application/json')) {
-      const text = await response.text();
-      console.error('Non-JSON response:', text);
-      throw new Error('Server error: Invalid response format');
+    const responseData = await response.json();
+
+    if (!response.ok) {
+      throw new Error(responseData.message || `HTTP error! status: ${response.status}`);
     }
+
+    return responseData;
+  } catch (error) {
+    console.error('API POST Error:', error);
+    throw error;
+  }
+};
+
+export const apiGet = async (endpoint, token) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token && { 'Authorization': `Bearer ${token}` })
+      }
+    });
 
     const data = await response.json();
 
@@ -33,72 +44,54 @@ export const apiFetch = async (url, options = {}) => {
 
     return data;
   } catch (error) {
-    console.error('API Error:', error);
+    console.error('API GET Error:', error);
     throw error;
   }
 };
 
-/**
- * Authenticated API fetch function
- * @param {string} url - API endpoint URL
- * @param {Object} options - Fetch options
- * @param {string} token - JWT token
- * @returns {Promise<Object>} - JSON response data
- */
-export const authenticatedApiFetch = async (url, options = {}, token) => {
-  if (!token) {
-    throw new Error('Authentication token required');
-  }
-
-  return apiFetch(url, {
-    ...options,
-    headers: {
-      ...options.headers,
-      'Authorization': `Bearer ${token}`
-    }
-  });
-};
-
-/**
- * GET request with authentication
- */
-export const apiGet = async (endpoint, token) => {
-  return authenticatedApiFetch(`${API_BASE_URL}${endpoint}`, { method: 'GET' }, token);
-};
-
-/**
- * POST request with authentication
- */
-export const apiPost = async (endpoint, data, token) => {
-  console.log('API POST Request:', { endpoint, data, hasToken: !!token });
-  
-  return authenticatedApiFetch(
-    `${API_BASE_URL}${endpoint}`, 
-    {
-      method: 'POST',
-      body: JSON.stringify(data)
-    }, 
-    token
-  );
-};
-
-/**
- * PUT request with authentication
- */
 export const apiPut = async (endpoint, data, token) => {
-  return authenticatedApiFetch(
-    `${API_BASE_URL}${endpoint}`, 
-    {
+  try {
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token && { 'Authorization': `Bearer ${token}` })
+      },
       body: JSON.stringify(data)
-    }, 
-    token
-  );
+    });
+
+    const responseData = await response.json();
+
+    if (!response.ok) {
+      throw new Error(responseData.message || `HTTP error! status: ${response.status}`);
+    }
+
+    return responseData;
+  } catch (error) {
+    console.error('API PUT Error:', error);
+    throw error;
+  }
 };
 
-/**
- * DELETE request with authentication
- */
 export const apiDelete = async (endpoint, token) => {
-  return authenticatedApiFetch(`${API_BASE_URL}${endpoint}`, { method: 'DELETE' }, token);
+  try {
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token && { 'Authorization': `Bearer ${token}` })
+      }
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || `HTTP error! status: ${response.status}`);
+    }
+
+    return data;
+  } catch (error) {
+    console.error('API DELETE Error:', error);
+    throw error;
+  }
 };

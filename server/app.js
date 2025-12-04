@@ -3,14 +3,19 @@ const cors = require("cors");
 const authRoutes = require("./routes/authRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const productRoutes = require("./routes/productRoutes");
+const categoryRoutes = require("./routes/categoryRoutes");
+const reviewRoutes = require("./routes/reviewRoutes");
+const dashboardRoutes = require("./routes/dashboardRoutes");
 
 const app = express();
 
-// CORS configuration - Railway + localhost development
+// CORS configuration
 const allowedOrigins = [
   'https://nexfora.vercel.app',
   'https://nexfora0-production.up.railway.app',
-  'http://localhost:5173'  // Development
+  'http://localhost:5173',
+  'http://localhost:3000'
 ];
 
 app.use(cors({
@@ -22,48 +27,50 @@ app.use(cors({
 }));
 
 app.use(express.json());
-app.use((req, res, next) => {
-  if (req.method === "POST" || req.method === "PUT") {
-    console.log("=== POST/PUT Request Debug ===");
-    console.log("Raw headers:", req.headers);
 
-    // Check if content-type is JSON
-    const contentType = req.headers["content-type"];
-    console.log("Content-Type:", contentType);
+// Request logging middleware (only in development)
+if (process.env.NODE_ENV !== 'production') {
+  app.use((req, res, next) => {
+    console.log(`${req.method} ${req.path} - ${new Date().toISOString()}`);
+    next();
+  });
+}
 
-    if (contentType && contentType.includes("application/json")) {
-      console.log("JSON request detected");
-    } else {
-      console.log("WARNING: Non-JSON content-type detected");
-    }
-  }
-  next();
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: "success",
+    message: "Server is running",
+    timestamp: new Date().toISOString()
+  });
 });
 
-// Request logging middleware
-app.use((req, res, next) => {
-  console.log(
-    `\n=== ${req.method} ${req.path} - ${new Date().toISOString()} ===`
-  );
-  console.log("Headers:", req.headers);
-  console.log("Body:", req.body);
-  console.log("Content-Type:", req.headers["content-type"]);
-  console.log("Content-Length:", req.headers["content-length"]);
-  next();
-});
-
-// Routes must come before error handlers
+// API Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/products", productRoutes);
+app.use("/api/categories", categoryRoutes);
+app.use("/api/reviews", reviewRoutes);
+app.use("/api/dashboard", dashboardRoutes);
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({
+    status: "error",
+    code: 404,
+    message: "Endpoint tidak ditemukan"
+  });
+});
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  console.error('Error:', err);
   res.status(500).json({
     status: "error",
     code: 500,
-    message: "Internal server error",
+    message: "Terjadi kesalahan pada server",
+    error: process.env.NODE_ENV !== 'production' ? err.message : undefined
   });
 });
 

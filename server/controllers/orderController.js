@@ -1,38 +1,41 @@
 const {
-  createOrder,
+  processCheckout,
   getOrdersByUserId,
   getOrderById,
   updateOrderStatus,
-  getAllOrders,
-  cancelOrder
+  cancelOrder,
+  getUserOrderStats
 } = require("../services/orderService");
 
-// Create new order
-async function createNewOrder(req, res) {
+// Process checkout
+async function checkout(req, res) {
   try {
-    console.log('Request body:', req.body);
     const userId = req.user.id;
-    const orderData = { ...req.body, user_id: userId };
+    const checkoutData = {
+      user_id: userId,
+      ...req.body
+    };
     
-    const newOrder = await createOrder(orderData);
+    const newOrder = await processCheckout(checkoutData);
     
     res.status(201).json({
       status: "success",
       code: 201,
-      message: "Order created successfully",
+      message: "Checkout berhasil",
       data: newOrder
     });
   } catch (err) {
+    console.error('Checkout error:', err);
     res.status(500).json({
       status: "error",
       code: 500,
       message: err.message
     });
   }
-};
+}
 
 // Get current user's orders
-const getUserOrders = async (req, res) => {
+async function getUserOrders(req, res) {
   try {
     const userId = req.user.id;
     const orders = await getOrdersByUserId(userId);
@@ -40,7 +43,7 @@ const getUserOrders = async (req, res) => {
     res.status(200).json({
       status: "success",
       code: 200,
-      message: "Orders retrieved successfully",
+      message: "Pesanan berhasil diambil",
       data: orders
     });
   } catch (err) {
@@ -50,10 +53,10 @@ const getUserOrders = async (req, res) => {
       message: err.message
     });
   }
-};
+}
 
 // Get specific order by ID
-const getOrder = async (req, res) => {
+async function getOrder(req, res) {
   try {
     const orderId = req.params.id;
     const userId = req.user.id;
@@ -64,7 +67,7 @@ const getOrder = async (req, res) => {
       return res.status(404).json({
         status: "error",
         code: 404,
-        message: "Order not found"
+        message: "Pesanan tidak ditemukan"
       });
     }
 
@@ -73,14 +76,14 @@ const getOrder = async (req, res) => {
       return res.status(403).json({
         status: "error",
         code: 403,
-        message: "Access denied"
+        message: "Akses ditolak"
       });
     }
 
     res.status(200).json({
       status: "success",
       code: 200,
-      message: "Order retrieved successfully",
+      message: "Pesanan berhasil diambil",
       data: order
     });
   } catch (err) {
@@ -90,10 +93,125 @@ const getOrder = async (req, res) => {
       message: err.message
     });
   }
-};
+}
+
+// Update order payment proof
+async function uploadPaymentProof(req, res) {
+  try {
+    const orderId = req.params.id;
+    const userId = req.user.id;
+    const { payment_proof } = req.body;
+    
+    const order = await getOrderById(orderId);
+    
+    if (!order) {
+      return res.status(404).json({
+        status: "error",
+        code: 404,
+        message: "Pesanan tidak ditemukan"
+      });
+    }
+    
+    if (order.user_id !== userId) {
+      return res.status(403).json({
+        status: "error",
+        code: 403,
+        message: "Akses ditolak"
+      });
+    }
+    
+    const updatedOrder = await updateOrderStatus(orderId, 'Dalam Proses', payment_proof);
+    
+    res.status(200).json({
+      status: "success",
+      code: 200,
+      message: "Bukti pembayaran berhasil diupload",
+      data: updatedOrder
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: "error",
+      code: 500,
+      message: err.message
+    });
+  }
+}
+
+// Cancel order
+async function cancelUserOrder(req, res) {
+  try {
+    const orderId = req.params.id;
+    const userId = req.user.id;
+    
+    const order = await getOrderById(orderId);
+    
+    if (!order) {
+      return res.status(404).json({
+        status: "error",
+        code: 404,
+        message: "Pesanan tidak ditemukan"
+      });
+    }
+    
+    if (order.user_id !== userId) {
+      return res.status(403).json({
+        status: "error",
+        code: 403,
+        message: "Akses ditolak"
+      });
+    }
+    
+    if (order.status === 'Selesai') {
+      return res.status(400).json({
+        status: "error",
+        code: 400,
+        message: "Pesanan yang sudah selesai tidak bisa dibatalkan"
+      });
+    }
+    
+    const cancelledOrder = await cancelOrder(orderId);
+    
+    res.status(200).json({
+      status: "success",
+      code: 200,
+      message: "Pesanan berhasil dibatalkan",
+      data: cancelledOrder
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: "error",
+      code: 500,
+      message: err.message
+    });
+  }
+}
+
+// Get user order statistics
+async function getOrderStats(req, res) {
+  try {
+    const userId = req.user.id;
+    const stats = await getUserOrderStats(userId);
+    
+    res.status(200).json({
+      status: "success",
+      code: 200,
+      message: "Statistik pesanan berhasil diambil",
+      data: stats
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: "error",
+      code: 500,
+      message: err.message
+    });
+  }
+}
 
 module.exports = {
-  createNewOrder,
+  checkout,
   getUserOrders,
-  getOrder
+  getOrder,
+  uploadPaymentProof,
+  cancelUserOrder,
+  getOrderStats
 };

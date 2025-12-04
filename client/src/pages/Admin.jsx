@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { FiUsers, FiShoppingBag, FiCheckCircle, FiClock, FiXCircle, FiLogOut, FiRefreshCw, FiFilter } from "react-icons/fi";
+import { FiUsers, FiShoppingBag, FiCheckCircle, FiClock, FiXCircle, FiLogOut, FiRefreshCw, FiFilter, FiPlus, FiEdit, FiTrash2 } from "react-icons/fi";
 import { API_CONFIG, createApiCall } from "../utils/apiConfig";
 
 const Admin = () => {
@@ -10,6 +10,31 @@ const Admin = () => {
   const [error, setError] = useState("");
   const [filter, setFilter] = useState("all"); // all, pending, completed, cancelled
   const [refreshKey, setRefreshKey] = useState(0);
+  
+  // State untuk form tambah kategori
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [categoryForm, setCategoryForm] = useState({
+    nama_kategori: "",
+    deskripsi: "",
+    tipe: "kelas", // kelas or jasa
+    is_active: true
+  });
+
+  // State untuk layanan/produk
+  const [products, setProducts] = useState([]);
+  const [productsLoading, setProductsLoading] = useState(false);
+  const [editProductModalOpen, setEditProductModalOpen] = useState(false);
+  const [productForm, setProductForm] = useState({
+    id: null,
+    nama_produk: "",
+    deskripsi: "",
+    harga: "",
+    durasi: "",
+    level: "beginner",
+    max_peserta: "",
+    stok: "",
+    is_active: true
+  });
 
   // Check if user is admin
   useEffect(() => {
@@ -19,6 +44,7 @@ const Admin = () => {
       return;
     }
     fetchOrders();
+    fetchProducts();
   }, [navigate, refreshKey]);
 
   const fetchOrders = async () => {
@@ -45,6 +71,54 @@ const Admin = () => {
       setError(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Toggle aktif/nonaktif layanan
+  const handleToggleActive = async (product) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) throw new Error('Token tidak ditemukan');
+
+      const res = await fetch(`http://localhost:5000/api/products/${product.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ is_active: !product.is_active })
+      });
+      if (!res.ok) {
+        const er = await res.json().catch(() => ({}));
+        throw new Error(er.message || 'Gagal mengubah status layanan');
+      }
+      await fetchProducts();
+    } catch (e) {
+      console.error('Toggle active error:', e);
+      setError(e.message);
+    }
+  };
+
+  // Hapus layanan
+  const handleDeleteProduct = async (product) => {
+    try {
+      if (!window.confirm(`Hapus layanan "${product.nama_produk}"?`)) return;
+      const token = localStorage.getItem('token');
+      if (!token) throw new Error('Token tidak ditemukan');
+      const res = await fetch(`http://localhost:5000/api/products/${product.id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (!res.ok) {
+        const er = await res.json().catch(() => ({}));
+        throw new Error(er.message || 'Gagal menghapus layanan');
+      }
+      await fetchProducts();
+    } catch (e) {
+      console.error('Delete product error:', e);
+      setError(e.message);
     }
   };
 
@@ -86,6 +160,147 @@ const Admin = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     navigate('/login');
+  };
+
+  // Fetch daftar layanan/produk
+  const fetchProducts = async () => {
+    try {
+      setProductsLoading(true);
+      const token = localStorage.getItem('token');
+      if (!token) throw new Error('Token tidak ditemukan');
+      const res = await fetch('http://localhost:5000/api/products', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!res.ok) {
+        const er = await res.json().catch(() => ({}));
+        throw new Error(er.message || 'Gagal mengambil data layanan');
+      }
+      const data = await res.json();
+      setProducts(Array.isArray(data) ? data : (data.products || []));
+    } catch (e) {
+      console.error('Fetch products error:', e);
+      setError(e.message);
+    } finally {
+      setProductsLoading(false);
+    }
+  };
+
+  const handleOpenEditProduct = (product) => {
+    setProductForm({
+      id: product.id,
+      nama_produk: product.nama_produk || "",
+      deskripsi: product.deskripsi || "",
+      harga: String(product.harga ?? ""),
+      durasi: product.durasi || "",
+      level: product.level || "beginner",
+      max_peserta: String(product.max_peserta ?? ""),
+      stok: String(product.stok ?? ""),
+      is_active: Boolean(product.is_active)
+    });
+    setEditProductModalOpen(true);
+  };
+
+  const handleEditProductChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setProductForm(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+  };
+
+  const handleUpdateProduct = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) throw new Error('Token tidak ditemukan');
+      if (!productForm.id) throw new Error('Produk tidak valid');
+
+      const payload = {
+        nama_produk: productForm.nama_produk,
+        deskripsi: productForm.deskripsi,
+        harga: parseFloat(productForm.harga || 0),
+        durasi: productForm.durasi,
+        level: productForm.level || null,
+        max_peserta: productForm.max_peserta ? parseInt(productForm.max_peserta) : null,
+        stok: productForm.stok ? parseInt(productForm.stok) : 0,
+        is_active: !!productForm.is_active
+      };
+
+      const res = await fetch(`http://localhost:5000/api/products/${productForm.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) {
+        const er = await res.json().catch(() => ({}));
+        throw new Error(er.message || 'Gagal memperbarui layanan');
+      }
+
+      setEditProductModalOpen(false);
+      setProductForm({
+        id: null, nama_produk: "", deskripsi: "", harga: "", durasi: "",
+        level: "beginner", max_peserta: "", stok: "", is_active: true
+      });
+      await fetchProducts();
+      alert('Layanan berhasil diperbarui');
+    } catch (e) {
+      console.error('Update product error:', e);
+      setError(e.message);
+    }
+  };
+
+  // Handler untuk input form kategori
+  const handleCategoryInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setCategoryForm(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+  };
+
+  // Handler untuk submit form kategori
+  const handleAddCategory = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('Token tidak ditemukan');
+      }
+
+      const response = await fetch('http://localhost:5000/api/categories', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(categoryForm)
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Gagal menambahkan kategori');
+      }
+
+      // Reset form dan tutup modal
+      setCategoryForm({
+        nama_kategori: "",
+        deskripsi: "",
+        tipe: "kelas",
+        is_active: true
+      });
+      setIsCategoryModalOpen(false);
+      
+      // Refresh daftar
+      setRefreshKey(prev => prev + 1);
+      
+      alert('Kategori berhasil ditambahkan!');
+    } catch (err) {
+      console.error('Add category error:', err);
+      setError(err.message);
+    }
   };
 
   const formatPrice = (price) => {
@@ -163,13 +378,22 @@ const Admin = () => {
               <h1 className="text-2xl font-bold">Admin Dashboard</h1>
               <p className="text-gray-400 text-sm">Kelola dan verifikasi pesanan</p>
             </div>
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg transition-colors"
-            >
-              <FiLogOut className="w-4 h-4" />
-              Logout
-            </button>
+            <div className="flex gap-4">
+              <button
+                onClick={() => setIsCategoryModalOpen(true)}
+                className="flex items-center gap-2 bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg transition-colors"
+              >
+                <FiPlus className="w-4 h-4" />
+                Tambah Kategori
+              </button>
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-2 bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg transition-colors"
+              >
+                <FiLogOut className="w-4 h-4" />
+                Logout
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -224,6 +448,155 @@ const Admin = () => {
             {error}
           </div>
         )}
+
+      {/* Modal Edit Layanan */}
+      {editProductModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-gray-800 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-xl font-bold">Edit Layanan/Kelas</h3>
+                <button 
+                  onClick={() => setEditProductModalOpen(false)}
+                  className="text-gray-400 hover:text-white"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <form onSubmit={handleUpdateProduct} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Nama</label>
+                  <input
+                    type="text"
+                    name="nama_produk"
+                    value={productForm.nama_produk}
+                    onChange={handleEditProductChange}
+                    className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-1">Deskripsi</label>
+                  <textarea
+                    name="deskripsi"
+                    value={productForm.deskripsi}
+                    onChange={handleEditProductChange}
+                    rows={3}
+                    className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Harga (IDR)</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <span className="text-gray-400">Rp</span>
+                      </div>
+                      <input
+                        type="number"
+                        name="harga"
+                        value={productForm.harga}
+                        onChange={handleEditProductChange}
+                        className="w-full bg-gray-700 border border-gray-600 rounded-lg pl-10 pr-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="0"
+                        min="0"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Durasi</label>
+                    <input
+                      type="text"
+                      name="durasi"
+                      value={productForm.durasi}
+                      onChange={handleEditProductChange}
+                      className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Contoh: 3 bulan / 10 sesi"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Level</label>
+                    <select
+                      name="level"
+                      value={productForm.level}
+                      onChange={handleEditProductChange}
+                      className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    >
+                      <option value="beginner">Pemula</option>
+                      <option value="intermediate">Menengah</option>
+                      <option value="advanced">Lanjutan</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Stok</label>
+                    <input
+                      type="number"
+                      name="stok"
+                      value={productForm.stok}
+                      onChange={handleEditProductChange}
+                      min="0"
+                      className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Maks. Peserta</label>
+                    <input
+                      type="number"
+                      name="max_peserta"
+                      value={productForm.max_peserta}
+                      onChange={handleEditProductChange}
+                      min="1"
+                      className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="is_active"
+                      name="is_active"
+                      checked={productForm.is_active}
+                      onChange={handleEditProductChange}
+                      className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500"
+                    />
+                    <label htmlFor="is_active" className="ml-2 text-sm font-medium">
+                      Aktif
+                    </label>
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-3 pt-4 border-t border-gray-700 mt-6">
+                  <button
+                    type="button"
+                    onClick={() => setEditProductModalOpen(false)}
+                    className="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white"
+                  >
+                    Batal
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+                  >
+                    Simpan Perubahan
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
 
         {/* Filter and Refresh */}
         <div className="flex justify-between items-center mb-6">
@@ -354,6 +727,172 @@ const Admin = () => {
           </div>
         </div>
       </div>
+
+      {/* Daftar Layanan/Kelas */}
+      <div className="mt-8 bg-gray-800/40 border border-gray-700 rounded-xl p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold flex items-center gap-2">
+            <FiShoppingBag className="w-5 h-5" /> Daftar Layanan/Kelas
+          </h2>
+          <button
+            onClick={() => setRefreshKey(prev => prev + 1)}
+            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded-lg text-sm"
+          >
+            <FiRefreshCw className="w-4 h-4" /> Refresh
+          </button>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-700">
+            <thead>
+              <tr className="text-left text-gray-300 text-sm">
+                <th className="px-4 py-2">Nama</th>
+                <th className="px-4 py-2">Harga</th>
+                <th className="px-4 py-2">Durasi</th>
+                <th className="px-4 py-2">Level</th>
+                <th className="px-4 py-2">Stok</th>
+                <th className="px-4 py-2">Aktif</th>
+                <th className="px-4 py-2">Aksi</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-800">
+              {productsLoading ? (
+                <tr><td colSpan={7} className="px-4 py-6 text-center text-gray-400">Memuat layanan...</td></tr>
+              ) : products.length === 0 ? (
+                <tr><td colSpan={7} className="px-4 py-6 text-center text-gray-400">Belum ada layanan</td></tr>
+              ) : (
+                products.map((p) => (
+                  <tr key={p.id} className="text-sm">
+                    <td className="px-4 py-3 font-medium">{p.nama_produk}</td>
+                    <td className="px-4 py-3">{formatPrice(Number(p.harga || 0))}</td>
+                    <td className="px-4 py-3">{p.durasi || '-'}</td>
+                    <td className="px-4 py-3">{p.level || '-'}</td>
+                    <td className="px-4 py-3">{p.stok ?? 0}</td>
+                    <td className="px-4 py-3">
+                      <span className={`px-2 py-1 rounded text-xs ${p.is_active ? 'bg-green-600/20 text-green-400' : 'bg-gray-600/20 text-gray-300'}`}>
+                        {p.is_active ? 'Aktif' : 'Nonaktif'}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => handleOpenEditProduct(p)}
+                          className="inline-flex items-center gap-2 bg-amber-600 hover:bg-amber-700 px-3 py-1.5 rounded"
+                        >
+                          <FiEdit className="w-4 h-4" /> Edit
+                        </button>
+                        <button
+                          onClick={() => handleToggleActive(p)}
+                          className={`inline-flex items-center gap-2 px-3 py-1.5 rounded ${p.is_active ? 'bg-gray-600 hover:bg-gray-700' : 'bg-green-600 hover:bg-green-700'}`}
+                        >
+                          {p.is_active ? 'Nonaktifkan' : 'Aktifkan'}
+                        </button>
+                        <button
+                          onClick={() => handleDeleteProduct(p)}
+                          className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 px-3 py-1.5 rounded"
+                        >
+                          <FiTrash2 className="w-4 h-4" /> Hapus
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Modal Tambah Kategori */}
+      {isCategoryModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-gray-800 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-xl font-bold">Tambah Kategori Baru</h3>
+                <button 
+                  onClick={() => setIsCategoryModalOpen(false)}
+                  className="text-gray-400 hover:text-white"
+                >
+                  ✕
+                </button>
+              </div>
+              
+              <form onSubmit={handleAddCategory} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Nama Kategori</label>
+                  <input
+                    type="text"
+                    name="nama_kategori"
+                    value={categoryForm.nama_kategori}
+                    onChange={handleCategoryInputChange}
+                    className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Contoh: Web Development"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-1">Tipe</label>
+                  <select
+                    name="tipe"
+                    value={categoryForm.tipe}
+                    onChange={handleCategoryInputChange}
+                    className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
+                  >
+                    <option value="kelas">Kelas</option>
+                    <option value="jasa">Jasa</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-1">Deskripsi</label>
+                  <textarea
+                    name="deskripsi"
+                    value={categoryForm.deskripsi}
+                    onChange={handleCategoryInputChange}
+                    rows={3}
+                    className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Jelaskan kategori ini"
+                    required
+                  />
+                </div>
+
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="is_active"
+                    name="is_active"
+                    checked={categoryForm.is_active}
+                    onChange={handleCategoryInputChange}
+                    className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500"
+                  />
+                  <label htmlFor="is_active" className="ml-2 text-sm font-medium">
+                    Aktif
+                  </label>
+                </div>
+
+                <div className="flex justify-end gap-3 pt-4 border-t border-gray-700 mt-6">
+                  <button
+                    type="button"
+                    onClick={() => setIsCategoryModalOpen(false)}
+                    className="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white"
+                  >
+                    Batal
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+                  >
+                    Simpan Kategori
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

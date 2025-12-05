@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { apiPost } from "../utils/apiHelpers";
+import { API_CONFIG } from "../utils/apiConfig";
 
 const Pesan = () => {
   const location = useLocation();
@@ -14,51 +15,76 @@ const Pesan = () => {
   const selectedType = location.state?.type || "";
   const selectedItem = location.state?.item || null;
 
-  const [tipe, setTipe] = useState(selectedType);
-  const [paket, setPaket] = useState(selectedItem?.title || "");
-  const [harga, setHarga] = useState(selectedItem?.price || 0);
+  const [products, setProducts] = useState([]);
+  const [tipe, setTipe] = useState(selectedItem?.kategori_tipe || selectedType);
+  const [selectedProductId, setSelectedProductId] = useState(selectedItem?.id || "");
+  const [harga, setHarga] = useState(selectedItem?.harga || 0);
   const [nama, setNama] = useState("");
   const [paketOptions, setPaketOptions] = useState([]);
   const [email, setEmail] = useState("");
   const [catatan, setCatatan] = useState("");
+  const [isLoadingProducts, setIsLoadingProducts] = useState(false);
 
-  // Pricing configuration
-  const pricing = {
-    kelas: {
-      Python: 100000,
-      "Dasar Pemrograman": 10000,
-    },
-    jasa: {
-      "Jasa Website": 500000,
-      Desain: 20000,
-    },
-  };
-
+  // Fetch products from backend
   useEffect(() => {
-    if (tipe === "kelas") {
-      setPaketOptions([
-        { value: "Python", label: "Python" },
-        { value: "Dasar Pemrograman", label: "Dasar Pemrograman" },
-      ]);
-      setPaket("Python");
-    } else if (tipe === "jasa") {
-      setPaketOptions([
-        { value: "Jasa Website", label: "Jasa Website" },
-        { value: "Desain", label: "Desain" },
-      ]);
-      setPaket("Jasa Website");
-    } else {
+    const fetchProducts = async () => {
+      try {
+        setIsLoadingProducts(true);
+        const res = await fetch(`${API_CONFIG.baseURL}/api/products`);
+        if (!res.ok) {
+          const er = await res.json().catch(() => ({}));
+          throw new Error(er.message || "Gagal mengambil data produk");
+        }
+        const data = await res.json();
+        const items = Array.isArray(data) ? data : (data.data || data.products || []);
+        setProducts(items);
+      } catch (err) {
+        console.error("Fetch products error:", err);
+        setError(err.message);
+      } finally {
+        setIsLoadingProducts(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  // Update paket options when tipe or products change
+  useEffect(() => {
+    if (!tipe) {
       setPaketOptions([]);
-      setPaket("");
+      setSelectedProductId("");
+      return;
     }
-  }, [tipe]);
 
-  // Update harga when paket changes
-  useEffect(() => {
-    if (tipe && paket) {
-      setHarga(pricing[tipe]?.[paket] || 0);
+    const filtered = products.filter((p) => p.kategori_tipe === tipe);
+    const options = filtered.map((p) => ({
+      value: p.id,
+      label: p.nama_produk,
+      harga: p.harga,
+    }));
+    setPaketOptions(options);
+
+    // If coming from selectedItem, keep its id if match; otherwise pick first
+    if (selectedProductId && filtered.some((p) => p.id === selectedProductId)) {
+      return;
     }
-  }, [tipe, paket, pricing]);
+    if (options.length > 0) {
+      setSelectedProductId(options[0].value);
+    } else {
+      setSelectedProductId("");
+    }
+  }, [tipe, products]);
+
+  // Update harga when selected product changes
+  useEffect(() => {
+    if (!selectedProductId) {
+      setHarga(0);
+      return;
+    }
+    const product = products.find((p) => p.id === selectedProductId);
+    setHarga(product?.harga || 0);
+  }, [selectedProductId, products]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -75,17 +101,10 @@ const Pesan = () => {
     }
 
     try {
-      // Format data sesuai backend baru (checkout dengan product_ids)
-      // Untuk sementara, kita perlu product_id yang sesuai
-      // Ini adalah temporary solution - idealnya pilih dari list products
-      const productIdMap = {
-        'Python': 2, // React JS Masterclass (contoh)
-        'Dasar Pemrograman': 1, // Full Stack Web Development (contoh)
-        'Jasa Website': 5, // Company Profile Website (contoh)
-        'Desain': 8, // Logo & Branding Package (contoh)
-      };
-
-      const productId = productIdMap[paket] || 1;
+      const productId = selectedProductId;
+      const selectedProduct = products.find((p) => p.id === productId);
+      const paketName = selectedProduct?.nama_produk || "";
+      const tipePemesanan = tipe || selectedProduct?.kategori_tipe || "";
 
       const checkoutData = {
         product_ids: [productId],
@@ -111,8 +130,8 @@ const Pesan = () => {
             orderData: {
               id_pesanan: order.id_pesanan,
               kode_pesanan: order.kode_pesanan,
-              nama_paket: paket,
-              tipe_pemesanan: tipe,
+              nama_paket: paketName,
+              tipe_pemesanan: tipePemesanan,
               total: order.total,
               catatan: catatan,
               nama_lengkap: nama,
@@ -182,8 +201,8 @@ const Pesan = () => {
             </label>
             <select
               className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={paket}
-              onChange={(e) => setPaket(e.target.value)}
+              value={selectedProductId}
+              onChange={(e) => setSelectedProductId(Number(e.target.value))}
               required
               disabled={!tipe || isLoading}
             >

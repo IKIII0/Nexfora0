@@ -65,7 +65,8 @@ const Admin = () => {
       console.log('Fetching admin orders...');
       const data = await createApiCall(API_CONFIG.endpoints.adminOrders);
       console.log('Received data:', data);
-      setOrders(data.orders || []);
+      // Backend mengirimkan bentuk { status, code, message, data }
+      setOrders(Array.isArray(data) ? data : (data.data || data.orders || []));
     } catch (err) {
       console.error('Fetch orders error:', err);
       setError(err.message);
@@ -176,7 +177,8 @@ const Admin = () => {
         throw new Error(er.message || 'Gagal mengambil data layanan');
       }
       const data = await res.json();
-      setProducts(Array.isArray(data) ? data : (data.products || []));
+      // Backend mengirimkan bentuk { status, code, message, data }
+      setProducts(Array.isArray(data) ? data : (data.data || data.products || []));
     } catch (e) {
       console.error('Fetch products error:', e);
       setError(e.message);
@@ -322,9 +324,13 @@ const Admin = () => {
     });
   };
 
+  const isPendingStatus = (status) => {
+    return status === 'Dalam Proses' || status === 'Menunggu Pembayaran';
+  };
+
   const filteredOrders = orders.filter(order => {
     if (filter === 'all') return true;
-    if (filter === 'pending') return order.status === 'Dalam Proses';
+    if (filter === 'pending') return isPendingStatus(order.status);
     if (filter === 'completed') return order.status === 'Selesai';
     if (filter === 'cancelled') return order.status === 'Dibatalkan';
     return true;
@@ -332,25 +338,35 @@ const Admin = () => {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'Dalam Proses': return 'text-yellow-400 bg-yellow-400/20 border-yellow-400/50';
-      case 'Selesai': return 'text-green-400 bg-green-400/20 border-green-400/50';
-      case 'Dibatalkan': return 'text-red-400 bg-red-400/20 border-red-400/50';
-      default: return 'text-gray-400 bg-gray-400/20 border-gray-400/50';
+      case 'Menunggu Pembayaran':
+      case 'Dalam Proses':
+        return 'text-yellow-400 bg-yellow-400/20 border-yellow-400/50';
+      case 'Selesai':
+        return 'text-green-400 bg-green-400/20 border-green-400/50';
+      case 'Dibatalkan':
+        return 'text-red-400 bg-red-400/20 border-red-400/50';
+      default:
+        return 'text-gray-400 bg-gray-400/20 border-gray-400/50';
     }
   };
 
   const getStatusIcon = (status) => {
     switch (status) {
-      case 'Dalam Proses': return <FiClock className="w-4 h-4" />;
-      case 'Selesai': return <FiCheckCircle className="w-4 h-4" />;
-      case 'Dibatalkan': return <FiXCircle className="w-4 h-4" />;
-      default: return <FiClock className="w-4 h-4" />;
+      case 'Menunggu Pembayaran':
+      case 'Dalam Proses':
+        return <FiClock className="w-4 h-4" />;
+      case 'Selesai':
+        return <FiCheckCircle className="w-4 h-4" />;
+      case 'Dibatalkan':
+        return <FiXCircle className="w-4 h-4" />;
+      default:
+        return <FiClock className="w-4 h-4" />;
     }
   };
 
   const stats = {
     total: orders.length,
-    pending: orders.filter(o => o.status === 'Dalam Proses').length,
+    pending: orders.filter(o => isPendingStatus(o.status)).length,
     completed: orders.filter(o => o.status === 'Selesai').length,
     cancelled: orders.filter(o => o.status === 'Dibatalkan').length
   };
@@ -688,12 +704,18 @@ const Admin = () => {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(order.status)}`}>
                           {getStatusIcon(order.status)}
-                          {order.status === 'Dalam Proses' ? 'Menunggu Verifikasi' : order.status === 'Selesai' ? 'Selesai' : 'Dibatalkan'}
+                          {order.status === 'Menunggu Pembayaran'
+                            ? 'Menunggu Pembayaran'
+                            : order.status === 'Dalam Proses'
+                            ? 'Menunggu Verifikasi'
+                            : order.status === 'Selesai'
+                            ? 'Selesai'
+                            : 'Dibatalkan'}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
                         <div className="flex items-center gap-2">
-                          {order.status === 'Dalam Proses' && (
+                          {isPendingStatus(order.status) && (
                             <>
                               <button
                                 onClick={() => handleVerifyOrder(order.id_pesanan)}

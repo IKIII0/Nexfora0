@@ -1,31 +1,41 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ProductCard from "../components/ProductCard";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { FaPython, FaBook } from "react-icons/fa";
+import { API_CONFIG } from "../utils/apiConfig";
 
 function Courses() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
 
-  // Daftar Kelas
-  const kelas = [
-    {
-      title: "Kelas Python Lengkap",
-      description:
-        "Belajar Python dari dasar hingga mahir. Cocok untuk data science dan machine learning.",
-      price: "Rp 100.000",
-      icon: <FaPython className="text-blue-400" size={32} />,
-    },
-    {
-      title: "Kelas Dasar Pemrograman Pascal",
-      description:
-        "Pelajari dasar-dasar pemrograman dengan Pascal. Sempurna untuk pemula yang ingin memahami logika pemrograman.",
-      price: "Rp 5.000 - Rp 10.000",
-      icon: <FaBook className="text-purple-400" size={32} />,
-    },
-  ];
+  const [kelas, setKelas] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchKelas = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(`${API_CONFIG.baseURL}/api/products?tipe=kelas`);
+        if (!res.ok) {
+          const er = await res.json().catch(() => ({}));
+          throw new Error(er.message || "Gagal mengambil data kelas");
+        }
+        const data = await res.json();
+        const items = Array.isArray(data) ? data : (data.data || data.products || []);
+        setKelas(items);
+      } catch (err) {
+        console.error("Fetch kelas error:", err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchKelas();
+  }, []);
 
   const handleBookClass = (item) => {
     const user = sessionStorage.getItem("nexfora_user");
@@ -83,18 +93,34 @@ function Courses() {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-          {kelas.map((item, index) => (
-            <div key={index} className="animate-on-load animate-fade-in delay-300">
-              <ProductCard
-                title={item.title}
-                description={item.description}
-                price={item.price}
-                icon={item.icon}
-                whatsappNumber="6282273875270"
-                onBook={() => handleBookClass(item)}
-              />
-            </div>
-          ))}
+          {loading ? (
+            <p className="col-span-2 text-center text-gray-400">Memuat kelas...</p>
+          ) : error ? (
+            <p className="col-span-2 text-center text-red-400">{error}</p>
+          ) : kelas.length === 0 ? (
+            <p className="col-span-2 text-center text-gray-400">Belum ada kelas</p>
+          ) : (
+            kelas.map((item, index) => (
+              <div key={item.id || index} className="animate-on-load animate-fade-in delay-300">
+                <ProductCard
+                  title={item.nama_produk || item.title}
+                  description={item.deskripsi || item.description}
+                  price={
+                    item.harga != null
+                      ? new Intl.NumberFormat("id-ID", {
+                          style: "currency",
+                          currency: "IDR",
+                          minimumFractionDigits: 0,
+                        }).format(Number(item.harga))
+                      : item.price
+                  }
+                  icon={<FaPython className="text-blue-400" size={32} />}
+                  whatsappNumber="6282273875270"
+                  onBook={() => handleBookClass(item)}
+                />
+              </div>
+            ))
+          )}
         </div>
 
         {/* Info Section */}

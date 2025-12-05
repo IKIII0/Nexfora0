@@ -1,16 +1,23 @@
 const pool = require("../db");
 
 // Get all products with filters
+// By default only returns active products.
+// If filters.include_inactive === true, inactive products will also be included.
 async function getAllProducts(filters = {}) {
   let query = `
     SELECT p.*, c.nama_kategori, c.tipe as kategori_tipe
     FROM products p
     JOIN categories c ON p.category_id = c.id
-    WHERE p.is_active = true
+    WHERE 1=1
   `;
   
   const values = [];
   let paramCount = 1;
+
+  // Only active products by default
+  if (!filters.include_inactive) {
+    query += ` AND p.is_active = true`;
+  }
   
   if (filters.category_id) {
     query += ` AND p.category_id = $${paramCount}`;

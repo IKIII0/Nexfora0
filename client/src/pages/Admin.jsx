@@ -80,7 +80,7 @@ const Admin = () => {
       const token = localStorage.getItem('token');
       if (!token) throw new Error('Token tidak ditemukan');
 
-      const res = await fetch(`http://localhost:5000/api/products/${product.id}`, {
+      const res = await fetch(`${API_CONFIG.baseURL}/api/products/${product.id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -105,7 +105,7 @@ const Admin = () => {
       if (!window.confirm(`Hapus layanan "${product.nama_produk}"?`)) return;
       const token = localStorage.getItem('token');
       if (!token) throw new Error('Token tidak ditemukan');
-      const res = await fetch(`http://localhost:5000/api/products/${product.id}`, {
+      const res = await fetch(`${API_CONFIG.baseURL}/api/products/${product.id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -168,7 +168,7 @@ const Admin = () => {
       setProductsLoading(true);
       const token = localStorage.getItem('token');
       if (!token) throw new Error('Token tidak ditemukan');
-      const res = await fetch('http://localhost:5000/api/products', {
+      const res = await fetch(`${API_CONFIG.baseURL}/api/products`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (!res.ok) {
@@ -226,7 +226,7 @@ const Admin = () => {
         is_active: !!productForm.is_active
       };
 
-      const res = await fetch(`http://localhost:5000/api/products/${productForm.id}`, {
+      const res = await fetch(`${API_CONFIG.baseURL}/api/products/${productForm.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -270,7 +270,7 @@ const Admin = () => {
         throw new Error('Token tidak ditemukan');
       }
 
-      const response = await fetch('http://localhost:5000/api/categories', {
+      const response = await fetch(`${API_CONFIG.baseURL}/api/categories`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

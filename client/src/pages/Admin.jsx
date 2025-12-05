@@ -20,6 +20,16 @@ const Admin = () => {
     is_active: true
   });
 
+  // State untuk edit kategori
+  const [isEditCategoryModalOpen, setIsEditCategoryModalOpen] = useState(false);
+  const [categoryEditForm, setCategoryEditForm] = useState({
+    id: null,
+    nama_kategori: "",
+    deskripsi: "",
+    tipe: "kelas",
+    is_active: true
+  });
+
   // State untuk form tambah produk
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [productAddForm, setProductAddForm] = useState({
@@ -174,6 +184,37 @@ const Admin = () => {
       alert('Produk berhasil ditambahkan');
     } catch (e) {
       console.error('Create product error:', e);
+      setError(e.message);
+    }
+  };
+
+  // Toggle aktif/nonaktif kategori
+  const handleToggleCategoryActive = async (category) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('Token tidak ditemukan');
+      }
+
+      const res = await fetch(`${API_CONFIG.baseURL}/api/categories/${category.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          is_active: category.is_active === false ? true : false
+        })
+      });
+
+      if (!res.ok) {
+        const er = await res.json().catch(() => ({}));
+        throw new Error(er.message || 'Gagal mengubah status kategori');
+      }
+
+      await fetchCategories();
+    } catch (e) {
+      console.error('Toggle category active error:', e);
       setError(e.message);
     }
   };
@@ -436,6 +477,108 @@ const Admin = () => {
     } catch (err) {
       console.error('Add category error:', err);
       setError(err.message);
+    }
+  };
+
+  // Buka modal edit kategori dengan data yang dipilih
+  const handleOpenEditCategory = (category) => {
+    setCategoryEditForm({
+      id: category.id,
+      nama_kategori: category.nama_kategori || "",
+      deskripsi: category.deskripsi || "",
+      tipe: category.tipe || "kelas",
+      is_active: category.is_active !== false
+    });
+    setIsEditCategoryModalOpen(true);
+  };
+
+  // Handler untuk input form edit kategori
+  const handleEditCategoryInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setCategoryEditForm(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+  };
+
+  // Handler submit edit kategori
+  const handleUpdateCategory = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('Token tidak ditemukan');
+      }
+      if (!categoryEditForm.id) {
+        throw new Error('Kategori tidak valid');
+      }
+
+      const response = await fetch(`${API_CONFIG.baseURL}/api/categories/${categoryEditForm.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          nama_kategori: categoryEditForm.nama_kategori,
+          deskripsi: categoryEditForm.deskripsi,
+          tipe: categoryEditForm.tipe,
+          is_active: categoryEditForm.is_active
+        })
+      });
+
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        throw new Error(error.message || 'Gagal memperbarui kategori');
+      }
+
+      // Tutup modal dan reset form
+      setIsEditCategoryModalOpen(false);
+      setCategoryEditForm({
+        id: null,
+        nama_kategori: "",
+        deskripsi: "",
+        tipe: "kelas",
+        is_active: true
+      });
+
+      // Refresh daftar kategori
+      await fetchCategories();
+
+      alert('Kategori berhasil diperbarui!');
+    } catch (err) {
+      console.error('Update category error:', err);
+      setError(err.message);
+    }
+  };
+
+  // Hapus kategori
+  const handleDeleteCategory = async (category) => {
+    try {
+      if (!window.confirm(`Hapus kategori "${category.nama_kategori}"?`)) return;
+
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('Token tidak ditemukan');
+      }
+
+      const res = await fetch(`${API_CONFIG.baseURL}/api/categories/${category.id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!res.ok) {
+        const er = await res.json().catch(() => ({}));
+        throw new Error(er.message || 'Gagal menghapus kategori');
+      }
+
+      await fetchCategories();
+      alert('Kategori berhasil dihapus');
+    } catch (e) {
+      console.error('Delete category error:', e);
+      setError(e.message);
     }
   };
 
@@ -755,6 +898,95 @@ const Admin = () => {
         </div>
       )}
 
+      {/* Modal Edit Kategori */}
+      {isEditCategoryModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-gray-800 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-xl font-bold">Edit Kategori</h3>
+                <button 
+                  onClick={() => setIsEditCategoryModalOpen(false)}
+                  className="text-gray-400 hover:text-white"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <form onSubmit={handleUpdateCategory} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Nama Kategori</label>
+                  <input
+                    type="text"
+                    name="nama_kategori"
+                    value={categoryEditForm.nama_kategori}
+                    onChange={handleEditCategoryInputChange}
+                    className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-1">Tipe</label>
+                  <select
+                    name="tipe"
+                    value={categoryEditForm.tipe}
+                    onChange={handleEditCategoryInputChange}
+                    className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
+                  >
+                    <option value="kelas">Kelas</option>
+                    <option value="jasa">Jasa</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-1">Deskripsi</label>
+                  <textarea
+                    name="deskripsi"
+                    value={categoryEditForm.deskripsi}
+                    onChange={handleEditCategoryInputChange}
+                    rows={3}
+                    className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
+                  />
+                </div>
+
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="edit_is_active"
+                    name="is_active"
+                    checked={categoryEditForm.is_active}
+                    onChange={handleEditCategoryInputChange}
+                    className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500"
+                  />
+                  <label htmlFor="edit_is_active" className="ml-2 text-sm font-medium">
+                    Aktif
+                  </label>
+                </div>
+
+                <div className="flex justify-end gap-3 pt-4 border-t border-gray-700 mt-6">
+                  <button
+                    type="button"
+                    onClick={() => setIsEditCategoryModalOpen(false)}
+                    className="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white"
+                  >
+                    Batal
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+                  >
+                    Simpan Perubahan
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
         {/* Filter and Refresh */}
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-4">
@@ -888,6 +1120,77 @@ const Admin = () => {
               </tbody>
             </table>
           </div>
+        </div>
+      </div>
+
+      {/* Daftar Kategori */}
+      <div className="mt-8 bg-gray-800/40 border border-gray-700 rounded-xl p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold flex items-center gap-2">
+            <FiUsers className="w-5 h-5" /> Daftar Kategori
+          </h2>
+          <button
+            onClick={() => fetchCategories()}
+            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded-lg text-sm"
+          >
+            <FiRefreshCw className="w-4 h-4" /> Refresh
+          </button>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-700">
+            <thead>
+              <tr className="text-left text-gray-300 text-sm">
+                <th className="px-4 py-2">Nama Kategori</th>
+                <th className="px-4 py-2">Tipe</th>
+                <th className="px-4 py-2">Status</th>
+                <th className="px-4 py-2">Aksi</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-800">
+              {categories.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="px-4 py-6 text-center text-gray-400">
+                    Belum ada kategori
+                  </td>
+                </tr>
+              ) : (
+                categories.map((c) => (
+                  <tr key={c.id} className="text-sm">
+                    <td className="px-4 py-3 font-medium">{c.nama_kategori}</td>
+                    <td className="px-4 py-3 capitalize">{c.tipe}</td>
+                    <td className="px-4 py-3">
+                      <span className={`px-2 py-1 rounded text-xs ${c.is_active !== false ? 'bg-green-600/20 text-green-400' : 'bg-gray-600/20 text-gray-300'}`}>
+                        {c.is_active !== false ? 'Aktif' : 'Nonaktif'}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => handleOpenEditCategory(c)}
+                          className="inline-flex items-center gap-2 bg-amber-600 hover:bg-amber-700 px-3 py-1.5 rounded"
+                        >
+                          <FiEdit className="w-4 h-4" /> Edit
+                        </button>
+                        <button
+                          onClick={() => handleToggleCategoryActive(c)}
+                          className={`inline-flex items-center gap-2 px-3 py-1.5 rounded ${c.is_active !== false ? 'bg-gray-600 hover:bg-gray-700' : 'bg-green-600 hover:bg-green-700'}`}
+                        >
+                          {c.is_active !== false ? 'Nonaktifkan' : 'Aktifkan'}
+                        </button>
+                        <button
+                          onClick={() => handleDeleteCategory(c)}
+                          className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 px-3 py-1.5 rounded"
+                        >
+                          <FiTrash2 className="w-4 h-4" /> Hapus
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
 

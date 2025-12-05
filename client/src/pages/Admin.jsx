@@ -23,6 +23,8 @@ const Admin = () => {
   // State untuk layanan/produk
   const [products, setProducts] = useState([]);
   const [productsLoading, setProductsLoading] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [selectedCategoryId, setSelectedCategoryId] = useState('');
   const [editProductModalOpen, setEditProductModalOpen] = useState(false);
   const [productForm, setProductForm] = useState({
     id: null,
@@ -45,7 +47,13 @@ const Admin = () => {
     }
     fetchOrders();
     fetchProducts();
+    fetchCategories();
   }, [navigate, refreshKey]);
+
+  // Refresh products automatically when category filter changes
+  useEffect(() => {
+    fetchProducts();
+  }, [selectedCategoryId]);
 
   const fetchOrders = async () => {
     try {
@@ -82,7 +90,7 @@ const Admin = () => {
       if (!token) throw new Error('Token tidak ditemukan');
 
       const res = await fetch(`${API_CONFIG.baseURL}/api/products/${product.id}`, {
-        method: 'PATCH',
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
@@ -169,7 +177,14 @@ const Admin = () => {
       setProductsLoading(true);
       const token = localStorage.getItem('token');
       if (!token) throw new Error('Token tidak ditemukan');
-      const res = await fetch(`${API_CONFIG.baseURL}/api/products`, {
+      const params = new URLSearchParams();
+      if (selectedCategoryId) {
+        params.append('category_id', selectedCategoryId);
+      }
+      // Admin harus bisa melihat layanan yang nonaktif juga
+      params.append('include_inactive', 'true');
+      const url = `${API_CONFIG.baseURL}/api/products?${params.toString()}`;
+      const res = await fetch(url, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (!res.ok) {
@@ -178,12 +193,36 @@ const Admin = () => {
       }
       const data = await res.json();
       // Backend mengirimkan bentuk { status, code, message, data }
-      setProducts(Array.isArray(data) ? data : (data.data || data.products || []));
+      const items = Array.isArray(data) ? data : (data.data || data.products || []);
+      setProducts(items);
     } catch (e) {
       console.error('Fetch products error:', e);
       setError(e.message);
     } finally {
       setProductsLoading(false);
+    }
+  };
+
+  // Fetch categories for services list
+  const fetchCategories = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) throw new Error('Token tidak ditemukan');
+
+      const res = await fetch(API_CONFIG.endpoints.getCategories, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!res.ok) {
+        const er = await res.json().catch(() => ({}));
+        throw new Error(er.message || 'Gagal mengambil kategori');
+      }
+      const data = await res.json();
+      const items = Array.isArray(data) ? data : (data.data || data.categories || []);
+      setCategories(items.filter(c => c.is_active !== false));
+    } catch (e) {
+      console.error('Fetch categories error:', e);
+      // Jangan override error utama jika sudah ada
+      if (!error) setError(e.message);
     }
   };
 
@@ -756,12 +795,26 @@ const Admin = () => {
           <h2 className="text-lg font-semibold flex items-center gap-2">
             <FiShoppingBag className="w-5 h-5" /> Daftar Layanan/Kelas
           </h2>
-          <button
-            onClick={() => setRefreshKey(prev => prev + 1)}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded-lg text-sm"
-          >
-            <FiRefreshCw className="w-4 h-4" /> Refresh
-          </button>
+          <div className="flex items-center gap-3">
+            <select
+              value={selectedCategoryId}
+              onChange={(e) => setSelectedCategoryId(e.target.value)}
+              className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Semua Kategori</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.nama_kategori} ({cat.tipe})
+                </option>
+              ))}
+            </select>
+            <button
+              onClick={() => setRefreshKey(prev => prev + 1)}
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded-lg text-sm"
+            >
+              <FiRefreshCw className="w-4 h-4" /> Refresh
+            </button>
+          </div>
         </div>
 
         <div className="overflow-x-auto">

@@ -17,7 +17,8 @@ async function getProducts(req, res) {
       level: req.query.level,
       min_price: req.query.min_price,
       max_price: req.query.max_price,
-      search: req.query.search
+      search: req.query.search,
+      include_inactive: req.query.include_inactive === 'true'
     };
     
     const products = await getAllProducts(filters);
